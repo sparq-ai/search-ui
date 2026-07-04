@@ -1,11 +1,12 @@
 import { expect, test } from '@playwright/test';
 
 /**
- * Live smoke against the REAL Sparq API — opt-in, credentials via env:
+ * Live smoke against the REAL Sparq API — opt-in via credentials from
+ * e2e/.env (gitignored; copy e2e/.env.example) or environment variables:
  *
  *   SPARQ_APP_ID=... SPARQ_API_KEY=... SPARQ_COLLECTION=... pnpm e2e
  *
- * Skipped entirely when the env vars are absent (normal CI runs).
+ * Skipped entirely when credentials are absent (normal CI runs).
  */
 const appId = process.env.SPARQ_APP_ID;
 const apiKey = process.env.SPARQ_API_KEY;

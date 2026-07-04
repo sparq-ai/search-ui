@@ -76,6 +76,8 @@ http://127.0.0.1:4517/e2e/fixtures/live.html?appId=YOUR_APP_ID&apiKey=YOUR_SEARC
 - [ ] DevTools → Network: inspect the actual `/v2` request/response payloads the adapter sends
 - [ ] Mangle the `apiKey` param → the error state renders ("Invalid API key")
 
+> Tip: put the same credentials in `e2e/.env` (copy `e2e/.env.example`; gitignored) and `pnpm e2e` will run the automated live-store smoke test too.
+
 ## Cross-cutting checks (any page)
 
 - [ ] **CSS isolation**: open `http://127.0.0.1:4517/e2e/fixtures/isolation.html` — the page CSS demands cursive/uppercase/7px-letter-spacing on everything with `!important`; widget interiors must look completely normal

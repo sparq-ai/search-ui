@@ -1,4 +1,19 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { defineConfig } from '@playwright/test';
+
+// Load e2e/.env (gitignored — see .env.example) for the live-store smoke test.
+// Real environment variables always win over the file.
+try {
+  const env = readFileSync(join(__dirname, '.env'), 'utf-8');
+  for (const line of env.split('\n')) {
+    const m = /^\s*([\w.]+)\s*=\s*(.*)\s*$/.exec(line);
+    if (!m || m[1]!.startsWith('#')) continue;
+    process.env[m[1]!] ??= m[2]!.replace(/^["']|["']$/g, '');
+  }
+} catch {
+  /* no .env file — live smoke will be skipped */
+}
 
 export default defineConfig({
   testDir: './tests',
