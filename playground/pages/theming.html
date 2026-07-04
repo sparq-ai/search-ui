@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Theming — Sparq Search UI</title>
+  <script src="/mock-data.js"></script>
+  <script type="module" src="/sparq-entry.ts"></script>
+  <style>
+    body { font-family: Georgia, serif; background: #0f172a; color: #e2e8f0; max-width: 860px; margin: 40px auto; padding: 0 20px; }
+    a { color: #a78bfa; }
+
+    /* Door 1: design tokens pierce the shadow boundary inward. */
+    sparq-search {
+      --sparq-font-family: Georgia, serif;
+      --sparq-color-text: #e2e8f0;
+      --sparq-color-text-muted: #94a3b8;
+      --sparq-color-bg: #1e293b;
+      --sparq-color-bg-elevated: #334155;
+      --sparq-color-primary: #a78bfa;
+      --sparq-color-primary-contrast: #1e1b4b;
+      --sparq-color-border: #475569;
+      --sparq-radius: 12px;
+      --sparq-spacing: 10px;
+    }
+
+    /* Door 2: ::part() for structural overrides. */
+    sparq-searchbox::part(input) { border-width: 2px; font-style: italic; }
+    sparq-pagination::part(link-active) { box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.35); }
+
+    .card { border: 1px solid #475569; border-radius: 12px; padding: 12px; margin-bottom: 8px; background: #1e293b; }
+    .card h3 { margin: 0 0 4px; font-size: 1rem; color: #e2e8f0; }
+    .card .meta { color: #94a3b8; font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+  <p><a href="/index.html">← playground</a></p>
+  <h1>Dark theme via tokens + parts</h1>
+  <p>No library CSS was harmed: everything below is <code>--sparq-*</code> custom properties and <code>::part()</code> selectors — the only two styling doors in.</p>
+
+  <sparq-search collection="products" api-host="mock:" items-per-page="6">
+    <sparq-searchbox placeholder="Search shoes…" suggestions min-chars="2"></sparq-searchbox>
+    <sparq-stats></sparq-stats>
+    <sparq-items>
+      <template>
+        <article class="card">
+          <h3>{{name}}</h3>
+          <div class="meta">{{brand}} · {{category}} · ${{price}}</div>
+        </article>
+      </template>
+    </sparq-items>
+    <sparq-pagination show-first-last></sparq-pagination>
+  </sparq-search>
+</body>
+</html>

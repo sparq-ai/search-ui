@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Basic — Sparq Search UI</title>
+  <script src="/mock-data.js"></script>
+  <script type="module" src="/sparq-entry.ts"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; }
+  </style>
+</head>
+<body>
+  <p><a href="/index.html">← playground</a></p>
+  <h1>Basic search</h1>
+
+  <sparq-search collection="products" api-host="mock:">
+    <sparq-searchbox placeholder="Search shoes…" autofocus></sparq-searchbox>
+    <sparq-stats></sparq-stats>
+    <sparq-items empty-text="No shoes match your search."></sparq-items>
+    <sparq-pagination items-per-page="20" padding="2" show-first-last></sparq-pagination>
+  </sparq-search>
+</body>
+</html>

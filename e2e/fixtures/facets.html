@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>e2e facets</title>
+  <script src="/e2e/fixtures/mock-data.js"></script>
+  <script src="/packages/components/dist/sparq.js" defer></script>
+</head>
+<body>
+  <sparq-search collection="products" api-host="mock:" routing items-per-page="10">
+    <sparq-searchbox placeholder="Search…"></sparq-searchbox>
+    <sparq-refinements clear-label="Clear all"></sparq-refinements>
+    <sparq-filters attribute="brand" header="Brand"></sparq-filters>
+    <sparq-filters attribute="category" header="Category"></sparq-filters>
+    <sparq-sort label="Sort" options="relevance|Relevance, price:asc|Price up, price:desc|Price down"></sparq-sort>
+    <sparq-range attribute="price"></sparq-range>
+    <sparq-stats></sparq-stats>
+    <sparq-items>
+      <template>
+        <article class="result-card"><h3>{{name}}</h3><p>{{brand}} · {{category}} · $<span class="price">{{price}}</span></p></article>
+      </template>
+    </sparq-items>
+    <sparq-pagination></sparq-pagination>
+  </sparq-search>
+</body>
+</html>

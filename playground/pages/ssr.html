@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SSR takeover — Sparq Search UI</title>
+  <script src="/mock-data.js"></script>
+  <script type="module" src="/sparq-entry.ts"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; }
+    .server-card, .card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; margin-bottom: 8px; }
+    .badge { display: inline-block; font-size: 0.75rem; padding: 2px 8px; border-radius: 999px; background: #fef3c7; color: #92400e; margin-bottom: 12px; }
+    nav.server-pagination a { margin-right: 8px; }
+  </style>
+</head>
+<body>
+  <p><a href="/index.html">← playground</a></p>
+  <h1>SEO takeover</h1>
+  <p>The block below is "server-rendered" HTML (what a bot indexes). Watch it get atomically replaced by the JS render after the first search — throttle the network in devtools to see it linger. If the search fails, it stays.</p>
+
+  <sparq-search collection="products" api-host="mock:" routing items-per-page="10">
+    <sparq-ssr>
+      <div class="badge">server-rendered fallback</div>
+      <div class="server-card"><strong>Nike Runner 100</strong> — Nike · Road · $60</div>
+      <div class="server-card"><strong>Nike Glide 113</strong> — Nike · Trail · $77</div>
+      <div class="server-card"><strong>Adidas Pulse 289</strong> — Adidas · Track · $91</div>
+      <nav class="server-pagination">
+        <a href="?page=2">Page 2</a>
+        <a href="?page=3">Page 3</a>
+        <a href="?f.brand=Nike">Nike only</a>
+      </nav>
+    </sparq-ssr>
+
+    <sparq-searchbox placeholder="Search shoes…"></sparq-searchbox>
+    <sparq-stats></sparq-stats>
+    <sparq-items>
+      <template>
+        <article class="card"><strong>{{name}}</strong> — {{brand}} · {{category}} · ${{price}}</article>
+      </template>
+    </sparq-items>
+    <sparq-pagination></sparq-pagination>
+  </sparq-search>
+
+  <script>
+    document.addEventListener('sparq:takeover', function () {
+      console.log('[demo] sparq:takeover — server HTML replaced by JS render');
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Facets — Sparq Search UI</title>
+  <script src="/mock-data.js"></script>
+  <script type="module" src="/sparq-entry.ts"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 960px; margin: 40px auto; padding: 0 20px; }
+    .layout { display: grid; grid-template-columns: 240px 1fr; gap: 32px; margin-top: 16px; }
+    aside > * { display: block; margin-bottom: 24px; }
+    .toolbar { display: flex; justify-content: space-between; align-items: center; margin: 12px 0; }
+    .card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; margin-bottom: 8px; }
+    .card h3 { margin: 0 0 4px; font-size: 1rem; }
+    .card .meta { color: #6b7280; font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+  <p><a href="/index.html">← playground</a></p>
+  <h1>Full search page</h1>
+
+  <sparq-search collection="products" api-host="mock:" routing items-per-page="10">
+    <sparq-searchbox placeholder="Search shoes…" suggestions min-chars="2"></sparq-searchbox>
+    <sparq-refinements clear-label="Reset all"></sparq-refinements>
+
+    <div class="layout">
+      <aside>
+        <sparq-filters attribute="brand" header="Brand" limit="4" show-more searchable></sparq-filters>
+        <sparq-filters attribute="category" header="Category" sort-by="alpha"></sparq-filters>
+        <sparq-range attribute="price" prefix="$" header="Price"></sparq-range>
+      </aside>
+      <main>
+        <div class="toolbar">
+          <sparq-stats></sparq-stats>
+          <sparq-sort label="Sort by" options="relevance|Relevance, price:asc|Price ↑, price:desc|Price ↓, name:asc|Name A–Z"></sparq-sort>
+        </div>
+        <sparq-items empty-text="No shoes match your filters.">
+          <template>
+            <article class="card">
+              <h3>{{name}}</h3>
+              <div class="meta">{{brand}} · {{category}} · ${{price}} · {{rating}}★</div>
+            </article>
+          </template>
+        </sparq-items>
+        <sparq-pagination padding="2"></sparq-pagination>
+      </main>
+    </div>
+  </sparq-search>
+</body>
+</html>

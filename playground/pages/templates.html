@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Templates — Sparq Search UI</title>
+  <script src="/mock-data.js"></script>
+  <script type="module" src="/sparq-entry.ts"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 860px; margin: 40px auto; padding: 0 20px; }
+    /* The customer's own CSS styles their own item markup — light DOM by design. */
+    .product { display: flex; gap: 16px; align-items: center; border-bottom: 1px solid #e5e7eb; padding: 12px 0; }
+    .product .swatch { width: 56px; height: 56px; border-radius: 12px; background: #eef2ff; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+    .product h3 { margin: 0; font-size: 1.05rem; }
+    .product .brand { color: #6b7280; font-size: 0.85rem; }
+    .product .price { margin-left: auto; font-weight: 700; color: #059669; }
+  </style>
+</head>
+<body>
+  <p><a href="/index.html">← playground</a></p>
+  <h1>Custom item templates</h1>
+  <p>The <code>&lt;template&gt;</code> below is the customer's own markup: <code>{{field}}</code> text bindings are always HTML-escaped, and URL attributes are scheme-checked.</p>
+
+  <sparq-search collection="products" api-host="mock:">
+    <sparq-searchbox placeholder="Search shoes…"></sparq-searchbox>
+    <sparq-stats></sparq-stats>
+    <sparq-items>
+      <template>
+        <a class="product" href="{{url}}">
+          <div class="swatch">👟</div>
+          <div>
+            <h3>{{name}}</h3>
+            <div class="brand">{{brand}} — {{category}}</div>
+          </div>
+          <div class="price">${{price}}</div>
+        </a>
+      </template>
+    </sparq-items>
+    <sparq-pagination></sparq-pagination>
+  </sparq-search>
+</body>
+</html>

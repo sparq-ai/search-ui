@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hooks — Sparq Search UI</title>
+  <script src="/mock-data.js"></script>
+  <script type="module" src="/sparq-entry.ts"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; }
+    .card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; margin-bottom: 8px; }
+    .deal { color: #059669; font-weight: 700; }
+    #log { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; font-family: monospace; font-size: 0.8rem; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <p><a href="/index.html">← playground</a></p>
+  <h1>Extension hooks</h1>
+  <p><code>transformResponse</code> adds a computed <code>deal</code> field, <code>queryHook</code> trims + ignores 1-char queries, <code>suggestionsSource</code> is a custom function, and <code>sparq:item-click</code> feeds the analytics log.</p>
+
+  <sparq-search id="search" collection="products" api-host="mock:">
+    <sparq-searchbox placeholder="Try a 1-char query — it won't search" suggestions min-chars="2"></sparq-searchbox>
+    <sparq-stats></sparq-stats>
+    <sparq-items>
+      <template>
+        <article class="card">
+          <strong>{{name}}</strong> — {{brand}} · ${{price}} <span class="deal">{{deal}}</span>
+        </article>
+      </template>
+    </sparq-items>
+    <sparq-pagination></sparq-pagination>
+  </sparq-search>
+
+  <h2>Analytics log</h2>
+  <div id="log">(click a result)</div>
+
+  <script>
+    document.addEventListener('sparq:ready', function () {
+      var search = document.getElementById('search');
+      search.hooks = {
+        transformResponse: function (res) {
+          return Object.assign({}, res, {
+            items: res.items.map(function (item) {
+              return Object.assign({}, item, { deal: item.price < 100 ? 'DEAL' : '' });
+            }),
+          });
+        },
+        queryHook: function (q, search) {
+          var trimmed = q.trim();
+          if (trimmed.length !== 1) search(trimmed);
+        },
+        suggestionsSource: function (q) {
+          var pool = window.__SPARQ_MOCK__.suggestions;
+          return Promise.resolve(pool.filter(function (s) { return s.indexOf(q.toLowerCase()) !== -1; }));
+        },
+      };
+    });
+
+    document.addEventListener('sparq:item-click', function (e) {
+      var log = document.getElementById('log');
+      log.textContent = 'item-click  index=' + e.detail.index + '  name=' + e.detail.item.name + '\n' + log.textContent;
+    });
+  </script>
+</body>
+</html>

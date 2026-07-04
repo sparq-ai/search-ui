@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sparq Search UI — Playground</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; color: #1f2937; }
+    h1 { font-size: 1.6rem; }
+    li { margin: 10px 0; }
+    a { color: #2563eb; }
+    p.hint { color: #6b7280; }
+  </style>
+</head>
+<body>
+  <h1>Sparq Search UI — Playground</h1>
+  <p class="hint">Every page runs against the in-memory mock client (<code>api-host="mock:"</code>) — no credentials needed. Each page doubles as living documentation for one scenario.</p>
+  <ul>
+    <li><a href="/pages/basic.html">Basic</a> — searchbox + stats + items + pagination</li>
+    <li><a href="/pages/facets.html">Facets</a> — filters, sort, range, refinement chips, full search page</li>
+    <li><a href="/pages/templates.html">Templates</a> — customer-defined item markup via <code>&lt;template&gt;</code></li>
+    <li><a href="/pages/theming.html">Theming</a> — <code>--sparq-*</code> tokens and <code>::part()</code> restyling</li>
+    <li><a href="/pages/ssr.html">SSR takeover</a> — server-rendered fallback replaced by JS render</li>
+    <li><a href="/pages/infinite.html">Infinite scroll</a> — <code>&lt;sparq-items-infinite auto&gt;</code></li>
+    <li><a href="/pages/hooks.html">Hooks</a> — transformResponse, queryHook, suggestionsSource, item-click analytics</li>
+  </ul>
+</body>
+</html>

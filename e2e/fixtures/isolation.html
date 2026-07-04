@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>e2e css isolation</title>
+  <script src="/e2e/fixtures/mock-data.js"></script>
+  <script src="/packages/components/dist/sparq.js" defer></script>
+  <style id="hostile">
+    /* Deliberately hostile page CSS — must NOT break component interiors. */
+    * {
+      font-family: cursive !important;
+      text-transform: uppercase !important;
+      letter-spacing: 7px !important;
+      line-height: 3 !important;
+    }
+    input, button, ul, li { all: unset !important; }
+  </style>
+</head>
+<body>
+  <div id="sentinel" style="width: 240px;">sentinel text</div>
+
+  <sparq-search collection="products" api-host="mock:" items-per-page="5">
+    <sparq-searchbox placeholder="Search…"></sparq-searchbox>
+    <sparq-filters attribute="brand" header="Brand"></sparq-filters>
+    <sparq-items>
+      <template><article class="result-card">{{name}}</article></template>
+    </sparq-items>
+    <sparq-pagination></sparq-pagination>
+  </sparq-search>
+</body>
+</html>

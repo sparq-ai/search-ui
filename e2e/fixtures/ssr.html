@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>e2e ssr takeover</title>
+  <script>window.__SPARQ_MOCK_DELAY__ = 250;</script>
+  <script src="/e2e/fixtures/mock-data.js"></script>
+  <script src="/packages/components/dist/sparq.js" defer></script>
+</head>
+<body>
+  <sparq-search collection="products" api-host="mock:" routing items-per-page="10">
+    <sparq-ssr id="fallback">
+      <div class="server-item">Nike Model 100 — server rendered</div>
+      <div class="server-item">Nike Model 101 — server rendered</div>
+      <nav><a href="?page=2">2</a></nav>
+    </sparq-ssr>
+    <sparq-searchbox placeholder="Search…"></sparq-searchbox>
+    <sparq-items>
+      <template><article class="result-card">{{name}}</article></template>
+    </sparq-items>
+    <sparq-pagination></sparq-pagination>
+  </sparq-search>
+  <script>
+    window.__takeover = false;
+    document.addEventListener('sparq:takeover', function () { window.__takeover = true; });
+  </script>
+</body>
+</html>

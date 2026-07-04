@@ -1,0 +1,21 @@
+{
+  "name": "@sparq/search-core",
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@vue/reactivity": "^3.5.13"
+  },
+  "devDependencies": {
+    "happy-dom": "^17.4.0",
+    "typescript": "^5.8.0",
+    "vitest": "^3.2.0"
+  }
+}

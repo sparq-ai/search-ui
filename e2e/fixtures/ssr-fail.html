@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>e2e ssr failure keeps fallback</title>
+  <!-- Real adapter pointed at a host the test aborts — the first search fails. -->
+  <script src="/packages/components/dist/sparq.js" defer></script>
+</head>
+<body>
+  <sparq-search collection="products" app-id="test-app" api-key="pk_test">
+    <sparq-ssr id="fallback">
+      <div class="server-item">Server rendered result — must stay visible on failure</div>
+    </sparq-ssr>
+    <sparq-searchbox placeholder="Search…"></sparq-searchbox>
+    <sparq-items>
+      <template><article class="result-card">{{name}}</article></template>
+    </sparq-items>
+  </sparq-search>
+</body>
+</html>

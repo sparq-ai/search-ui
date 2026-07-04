@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>e2e basic</title>
+  <script src="/e2e/fixtures/mock-data.js"></script>
+  <script src="/packages/components/dist/sparq.js" defer></script>
+</head>
+<body>
+  <sparq-search collection="products" api-host="mock:" items-per-page="10">
+    <sparq-searchbox placeholder="Search…"></sparq-searchbox>
+    <sparq-stats></sparq-stats>
+    <sparq-items empty-text="Nothing found.">
+      <template>
+        <article class="result-card"><h3>{{name}}</h3><p>{{brand}} — ${{price}}</p><a href="{{url}}">View</a></article>
+      </template>
+    </sparq-items>
+    <sparq-pagination show-first-last></sparq-pagination>
+  </sparq-search>
+</body>
+</html>

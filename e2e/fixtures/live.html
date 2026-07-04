@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>e2e live smoke</title>
+  <script src="/packages/components/dist/sparq.js" defer></script>
+</head>
+<body>
+  <div id="root"></div>
+  <script>
+    // Credentials arrive via query params so they never live in the repo.
+    window.addEventListener('DOMContentLoaded', function () {
+      var p = new URLSearchParams(location.search);
+      var el = document.createElement('sparq-search');
+      el.setAttribute('app-id', p.get('appId') || '');
+      el.setAttribute('api-key', p.get('apiKey') || '');
+      el.setAttribute('collection', p.get('collection') || '');
+      el.setAttribute('items-per-page', '5');
+      el.innerHTML =
+        '<sparq-searchbox placeholder="Search…"></sparq-searchbox>' +
+        '<sparq-stats></sparq-stats>' +
+        '<sparq-filters attribute="system_vendor" header="Vendor"></sparq-filters>' +
+        '<sparq-items></sparq-items>' +
+        '<sparq-pagination></sparq-pagination>';
+      document.getElementById('root').appendChild(el);
+    });
+  </script>
+</body>
+</html>

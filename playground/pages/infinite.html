@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Infinite scroll — Sparq Search UI</title>
+  <script src="/mock-data.js"></script>
+  <script type="module" src="/sparq-entry.ts"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; }
+    .row { border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+  <p><a href="/index.html">← playground</a></p>
+  <h1>Infinite scroll</h1>
+  <p>Scroll to the bottom — an IntersectionObserver sentinel loads the next page automatically (<code>auto</code>). Remove the attribute for a "Load more" button instead.</p>
+
+  <sparq-search collection="products" api-host="mock:" items-per-page="8">
+    <sparq-searchbox placeholder="Search shoes…"></sparq-searchbox>
+    <sparq-stats template="{totalItems} shoes"></sparq-stats>
+    <sparq-items-infinite auto>
+      <template>
+        <div class="row"><strong>{{name}}</strong> — {{brand}} · ${{price}}</div>
+      </template>
+    </sparq-items-infinite>
+  </sparq-search>
+</body>
+</html>
