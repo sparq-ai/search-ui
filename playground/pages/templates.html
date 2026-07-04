@@ -14,6 +14,8 @@
     .product h3 { margin: 0; font-size: 1.05rem; }
     .product .brand { color: #6b7280; font-size: 0.85rem; }
     .product .price { margin-left: auto; font-weight: 700; color: #059669; }
+    .raw summary { cursor: pointer; color: #6b7280; font-size: 0.8rem; }
+    .raw pre { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px; font-size: 0.75rem; overflow-x: auto; }
   </style>
 </head>
 <body>
@@ -26,14 +28,20 @@
     <sparq-stats></sparq-stats>
     <sparq-items>
       <template>
-        <a class="product" href="{{url}}">
-          <div class="swatch">👟</div>
-          <div>
-            <h3>{{name}}</h3>
-            <div class="brand">{{brand}} — {{category}}</div>
-          </div>
-          <div class="price">${{price}}</div>
-        </a>
+        <div class="product-row">
+          <a class="product" href="{{url}}">
+            <div class="swatch">👟</div>
+            <div>
+              <h3>{{name}}</h3>
+              <div class="brand">{{brand}} — {{category}}</div>
+            </div>
+            <div class="price">${{price}}</div>
+          </a>
+          <details class="raw">
+            <summary>raw item</summary>
+            <pre>{{$item}}</pre>
+          </details>
+        </div>
       </template>
     </sparq-items>
     <sparq-pagination></sparq-pagination>

@@ -31,6 +31,14 @@ describe('compileItemTemplate — rendering', () => {
     expect(render({}).querySelector('span')!.textContent).toBe('');
   });
 
+  it('{{$item}} outputs the entire record as JSON text (never parsed as HTML)', () => {
+    const render = compileItemTemplate(makeTemplate('<pre>{{$item}}</pre>'));
+    const item = { name: 'A', nested: { x: 1 }, evil: '<script>alert(1)</script>' };
+    const pre = render(item).querySelector('pre')!;
+    expect(JSON.parse(pre.textContent!)).toEqual(item);
+    expect(pre.querySelector('script')).toBeNull();
+  });
+
   it('renderBlank produces the same structure with blank values (skeletons)', () => {
     const render = compileItemTemplate(makeTemplate('<article><h3>{{name}}</h3></article>'));
     const frag = renderBlank(render);

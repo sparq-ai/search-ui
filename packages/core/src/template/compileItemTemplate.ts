@@ -6,6 +6,9 @@ const BINDING_RE = /\{\{\s*([\w$][\w.$-]*)\s*\}\}/g;
 export type ItemRenderer = (item: Item) => DocumentFragment;
 
 function resolvePath(item: Item, path: string): string {
+  // {{$item}} — the entire record as pretty-printed JSON (wrap in <pre> for
+  // readable debugging). Rendered via textContent like every binding: safe.
+  if (path === '$item') return JSON.stringify(item, null, 2);
   let current: unknown = item;
   for (const seg of path.split('.')) {
     if (current === null || current === undefined || typeof current !== 'object') return '';

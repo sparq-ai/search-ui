@@ -27,6 +27,13 @@ Renders the current page of results. Item markup is defined by **your** `<templa
 ## Template bindings
 
 - `{{field}}` works in text and attributes; dot paths reach nested data: `{{specs.color}}`.
+- Object/array fields render as JSON: `{{variants}}`.
+- `{{$item}}` renders the **entire record** as pretty-printed JSON — handy while building a template to see what fields exist:
+  ```html
+  <template>
+    <details><summary>raw item</summary><pre>{{$item}}</pre></details>
+  </template>
+  ```
 - Missing fields render as empty strings.
 - **Text bindings are always HTML-escaped** — data can never inject markup.
 - `on*` attributes in the template are stripped; `href`/`src`/`srcset` reject `javascript:`/`data:` URLs.
