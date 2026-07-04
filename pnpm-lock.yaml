@@ -74,6 +74,28 @@ importers:
         specifier: ^3.2.0
         version: 3.2.6(happy-dom@17.6.3)(jiti@2.7.0)
 
+  playground:
+    dependencies:
+      '@sparq/search-core':
+        specifier: workspace:*
+        version: link:../packages/core
+      '@sparq/search-ui':
+        specifier: workspace:*
+        version: link:../packages/components
+      '@vue/reactivity':
+        specifier: ^3.5.13
+        version: 3.5.39
+      vue:
+        specifier: ^3.5.13
+        version: 3.5.39(typescript@5.9.3)
+    devDependencies:
+      '@vitejs/plugin-vue':
+        specifier: ^5.2.0
+        version: 5.2.4(vite@6.4.3(jiti@2.7.0))(vue@3.5.39(typescript@5.9.3))
+      vite:
+        specifier: ^6.3.0
+        version: 6.4.3(jiti@2.7.0)
+
 packages:
 
   '@babel/helper-string-parser@7.29.7':
