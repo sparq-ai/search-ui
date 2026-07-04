@@ -19,6 +19,8 @@ Build a complete search frontend for [Sparq.ai](https://sparq.ai) on a plain HTM
 
 **Browser support:** Chrome/Edge 79+, Firefox 78+, Safari 13.1+ (iOS 13.4+). **IE11 is not supported and cannot be** (Vue 3 requires native `Proxy`; Shadow DOM has no polyfill) — in unsupported browsers the `<sparq-ssr>` server-rendered fallback remains fully usable.
 
+**[Documentation](./docs/README.md)** — [getting started](./docs/getting-started.md), component reference, [theming](./docs/theming.md), [JavaScript API & hooks](./docs/javascript-api.md), [SEO](./docs/seo.md), and [performance](./docs/performance.md).
+
 See [ARCHITECTURE.md](./ARCHITECTURE.md) for the full design: layer model, headless core, adapter contract, hooks, CSS isolation guarantees, Core Web Vitals playbook, and roadmap.
 
 ## Development

@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const BANNED = /\bhits?\b/i;
-const SCAN_DIRS = ['packages/core/src', 'packages/components/src', 'playground', 'e2e'];
+const SCAN_DIRS = ['packages/core/src', 'packages/components/src', 'playground', 'e2e', 'docs'];
 const ALLOWLIST = new Set(['packages/core/src/client/sparqClient.ts']);
 const EXTENSIONS = new Set(['.ts', '.vue', '.js', '.mjs', '.html', '.css', '.md']);
 
