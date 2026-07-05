@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>e2e range slider</title>
+  <script src="/e2e/fixtures/mock-data.js"></script>
+  <script src="/packages/components/dist/sparq.js" defer></script>
+</head>
+<body>
+  <!-- fixture dataset prices span 50..210 -->
+  <sparq-search collection="products" api-host="mock:" routing items-per-page="10">
+    <sparq-searchbox placeholder="Search…"></sparq-searchbox>
+    <sparq-refinements clear-label="Clear all"></sparq-refinements>
+    <sparq-range attribute="price" prefix="$" step="5"></sparq-range>
+    <sparq-stats></sparq-stats>
+    <sparq-items>
+      <template><article class="result-card">{{name}} — $<span class="price">{{price}}</span></article></template>
+    </sparq-items>
+  </sparq-search>
+</body>
+</html>

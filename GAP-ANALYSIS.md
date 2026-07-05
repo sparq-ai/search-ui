@@ -30,7 +30,7 @@ Unique to search-ui (no store-ui counterpart): `<sparq-ssr>` SEO takeover, two-w
 | ☐ | **Popular searches** | Suggestions sourced from a dedicated collection (`SqPopularSearch`, `PopularSearchProcessor`, `popularCollectionId`) | Needs the popular-searches collection convention from the backend; fits the existing `suggestionsSource` hook as a built-in | S–M |
 | ☐ | **Merchandising redirects** | Keyword → URL redirect on Enter (`SqRedirects`, `RedirectProcessor`, `redirectsCollectionId`), internal/external | Backend collection convention; hook into searchbox submit | S–M |
 | ☐ | **Page-size selector widget** | User-facing per-page dropdown (`SqPerPage`) | Controller already supports `setItemsPerPage`; widget only | S |
-| ☐ | **True dual-thumb range slider** | Slider UI with min/max inputs, prefix/suffix, debounce (`SqSlider`) | Upgrade `sparq-range` (keep inputs as fallback/a11y); no third-party dep — build on two overlaid native ranges | M |
+| ☑ shipped | **True dual-thumb range slider** | Slider UI with min/max inputs, prefix/suffix, debounce (`SqSlider`) | Done 2026-07-05: track-level pointer handling (nearest-thumb pick, works on all engines incl. Firefox), keyboard/AT via native inputs, bounds-freeze policy, full-span-clears-filter | M |
 | ☐ | **Prev/Next pager mode** | Minimal two-button pager (`SqPrevNext`) | Attribute/variant on `sparq-pagination` | S |
 | ☐ | **Responsive pagination meta-config** | Different pagination mode desktop vs mobile, scroll-to-top on page change (`SqSyPager`) | Could be CSS-guidance + two widgets, or a `mode-mobile` attribute | S–M |
 
