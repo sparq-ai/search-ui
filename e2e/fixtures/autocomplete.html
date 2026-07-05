@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>e2e autocomplete</title>
+  <script>
+    // Per-collection datasets for the federated panel.
+    (function () {
+      var products = [];
+      var brands = ['Nike', 'Adidas', 'Asics'];
+      for (var b = 0; b < brands.length; b++) {
+        for (var i = 0; i < 6; i++) {
+          products.push({
+            title: brands[b] + ' Runner ' + (100 + i),
+            brand: brands[b],
+            price: 60 + i * 10,
+            url: '/products/' + brands[b].toLowerCase() + '-' + i,
+            image: '/img/' + b + '-' + i + '.jpg',
+          });
+        }
+      }
+      window.__MOCK_COLLECTIONS__ = {
+        PRODUCTS: products,
+        CATEGORIES: [
+          { title: 'Nike Running', url: '/c/nike-running' },
+          { title: 'Trail Shoes', url: '/c/trail' },
+        ],
+        POPULAR: [
+          { query: 'nike runner' },
+          { query: 'trail shoes' },
+          { query: 'adidas' },
+          { query: 'asics gel' },
+        ],
+      };
+    })();
+  </script>
+  <script src="/packages/components/dist/sparq.js" defer></script>
+  <style>
+    body { margin: 0; font-family: system-ui, sans-serif; }
+    header { padding: 16px; background: #f3f4f6; }
+    #Search-In-Header { width: 360px; padding: 8px; }
+    main { padding: 24px; height: 1200px; }
+    .ac-product { display: flex; gap: 8px; align-items: center; text-decoration: none; color: #111; }
+    .ac-product .price { margin-left: auto; font-weight: 600; }
+    .ac-cat { color: #2563eb; text-decoration: none; }
+    #own-instance { position: fixed; bottom: 8px; left: 16px; width: 300px; background: #fff; }
+  </style>
+</head>
+<body>
+  <header>
+    <form action="/e2e/fixtures/search-landing.html">
+      <input id="Search-In-Header" name="q" type="text" placeholder="Theme search box" />
+    </form>
+  </header>
+
+  <sparq-autocomplete
+    id="ac-main"
+    input="#Search-In-Header"
+    search-url="/e2e/fixtures/search-landing.html"
+  >
+    <sparq-ac-source title="Popular" collection="POPULAR" limit="4" show-on="empty">
+      <template><button type="button" class="ac-popular">{{query}}</button></template>
+    </sparq-ac-source>
+    <sparq-ac-source title="Products" collection="PRODUCTS" limit="4">
+      <template>
+        <a class="ac-product" href="{{url}}"><span class="t">{{title}}</span><span class="price">${{price}}</span></a>
+      </template>
+    </sparq-ac-source>
+    <sparq-ac-source title="Categories" collection="CATEGORIES" limit="5">
+      <template><a class="ac-cat" href="{{url}}">{{title}}</a></template>
+    </sparq-ac-source>
+  </sparq-autocomplete>
+
+  <main>page content</main>
+
+  <!-- Own-input mode, pinned to the viewport bottom to exercise flip-above. -->
+  <sparq-autocomplete id="own-instance" search-url="/e2e/fixtures/search-landing.html" placeholder="Own input…">
+    <sparq-ac-source title="Products" collection="PRODUCTS" limit="3">
+      <template><a class="ac-product" href="{{url}}">{{title}}</a></template>
+    </sparq-ac-source>
+  </sparq-autocomplete>
+
+  <script>
+    window.__SPARQ_REQUESTS__ = [];
+    window.__AC_EVENTS__ = [];
+    document.addEventListener('sparq:ready', function () {
+      var mock = window.SparqSearchUI.createMockClient(window.__MOCK_COLLECTIONS__, {});
+      window.SparqSearchUI.setClient({
+        search: function (req, opts) {
+          window.__SPARQ_REQUESTS__.push(req.collection + ':' + req.query);
+          return mock.search(req, opts);
+        },
+      });
+    });
+    ['sparq:ac-open', 'sparq:ac-close', 'sparq:ac-select'].forEach(function (name) {
+      document.addEventListener(name, function (e) {
+        window.__AC_EVENTS__.push({ name: name, detail: JSON.parse(JSON.stringify(e.detail || {})) });
+      });
+    });
+  </script>
+</body>
+</html>

@@ -55,11 +55,22 @@ function delay(ms: number, signal?: AbortSignal): Promise<void> {
  * In-memory search engine implementing the SparqClient contract, faithful to the
  * real backend's semantics — including server-side disjunctive facet counts
  * (a facet's own filter is excluded when aggregating that facet, ARCHITECTURE §4).
+ *
+ * Accepts one dataset (served for every collection) or a per-collection record
+ * (federated autocomplete demos/tests). Unknown collections return empty
+ * results — a misconfigured section should hide, not break its siblings.
  */
-export function createMockClient(data: Item[], opts: MockClientOptions = {}): SparqClient {
+export function createMockClient(
+  data: Item[] | Record<string, Item[]>,
+  opts: MockClientOptions = {},
+): SparqClient {
+  const datasetFor = (collection: string): Item[] =>
+    Array.isArray(data) ? data : (data[collection] ?? []);
+
   const client: SparqClient = {
     async search(req: SearchRequest, callOpts?: { signal?: AbortSignal }): Promise<SearchResponse> {
       const started = performance.now();
+      const dataset = datasetFor(req.collection);
       if (opts.delayMs) await delay(opts.delayMs, callOpts?.signal);
       if (callOpts?.signal?.aborted) throw new DOMException('Aborted', 'AbortError');
 
@@ -68,7 +79,7 @@ export function createMockClient(data: Item[], opts: MockClientOptions = {}): Sp
         matchesFacetFilters(item, req.facetFilters, exceptFacet) &&
         matchesNumericFilters(item, req.numericFilters);
 
-      let matched = data.filter((item) => baseMatch(item));
+      let matched = dataset.filter((item) => baseMatch(item));
 
       if (req.sort) {
         const [field, dir] = req.sort.split(':');
@@ -85,7 +96,7 @@ export function createMockClient(data: Item[], opts: MockClientOptions = {}): Sp
       // by everything EXCEPT that facet's own refinement.
       const facets: Record<string, Record<string, number>> = {};
       for (const attr of req.facets) {
-        const pool = data.filter((item) => baseMatch(item, attr));
+        const pool = dataset.filter((item) => baseMatch(item, attr));
         const counts: Record<string, number> = {};
         for (const item of pool) {
           const v = item[attr];
@@ -97,7 +108,7 @@ export function createMockClient(data: Item[], opts: MockClientOptions = {}): Sp
 
       const facetStats: Record<string, { min: number; max: number }> = {};
       for (const attr of req.numericFacets) {
-        const nums = data
+        const nums = dataset
           .filter((item) => matchesQuery(item, req.query, req.searchFields))
           .map((item) => item[attr])
           .filter((v): v is number => typeof v === 'number');

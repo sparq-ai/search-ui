@@ -58,3 +58,35 @@ describe('mockClient — faithful to backend semantics', () => {
     await expect(p).rejects.toMatchObject({ name: 'AbortError' });
   });
 });
+
+describe('mockClient — multi-collection record datasets', () => {
+  const COLLECTIONS = {
+    PRODUCTS: DATA,
+    CATEGORIES: [
+      { title: 'Road running', url: '/c/road' },
+      { title: 'Trail running', url: '/c/trail' },
+    ],
+  };
+
+  it('routes requests to the dataset matching req.collection', async () => {
+    const client = createMockClient(COLLECTIONS);
+    const products = await client.search(req({ collection: 'PRODUCTS' }));
+    const categories = await client.search(req({ collection: 'CATEGORIES', facets: [], numericFacets: [] }));
+    expect(products.totalItems).toBe(4);
+    expect(categories.totalItems).toBe(2);
+    expect(categories.items[0]).toMatchObject({ title: 'Road running' });
+  });
+
+  it('unknown collections return empty results, not an error', async () => {
+    const client = createMockClient(COLLECTIONS);
+    const res = await client.search(req({ collection: 'NOPE', facets: [], numericFacets: [] }));
+    expect(res.totalItems).toBe(0);
+    expect(res.items).toEqual([]);
+  });
+
+  it('array datasets keep serving every collection (back-compat)', async () => {
+    const client = createMockClient(DATA);
+    const res = await client.search(req({ collection: 'ANYTHING' }));
+    expect(res.totalItems).toBe(4);
+  });
+});

@@ -55,8 +55,8 @@ search-ui/
 │   │       ├── state.ts                    # UiState / SearchResults / SearchState types
 │   │       ├── controller/
 │   │       │   ├── SearchController.ts
+│   │       │   ├── AutocompleteController.ts  # federated N-source fan-out (sparq-autocomplete)
 │   │       │   ├── requestBuilder.ts       # state + registered widgets → one SearchRequest
-│   │       │   ├── scheduler.ts            # debounce + microtask coalescing
 │   │       │   └── cache.ts                # LRU + TTL + in-flight promise de-dupe
 │   │       ├── client/
 │   │       │   ├── types.ts                # SparqClient / SearchRequest / SearchResponse / SearchError
@@ -247,6 +247,8 @@ Customers server-render the search results HTML for the current URL; in browsers
 | Tag | Key attributes | Events | Notes |
 |---|---|---|---|
 | `sparq-search` | `app-id`\*, `api-key`\*, `collection`\*, `api-host`, `search-fields`, `return-fields`, `filter`, `items-per-page` (20), `debounce` (200), `stalled-delay` (200), `routing`, `search-on-load` (default true) | `sparq:search`, `sparq:error`, `sparq:query-change`, `sparq:refine`, `sparq:page-change` | Provider; renders `<slot>` only; exposes `el.controller`, `el.hooks` |
+| `sparq-autocomplete` | `input` (external-input selector; omit → own field), `app-id`, `api-key`, `api-host`, `search-url` (`/search`), `query-param` (`q`), `min-chars` (1), `debounce` (200), `placeholder`, `view-all` | `sparq:ac-open`, `sparq:ac-close`, `sparq:ac-select` | Federated panel over its own `AutocompleteController` (one parallel request per visible source, per-source race guard + failure isolation); fixed-position overlay, non-destructive ARIA on the host input |
+| `sparq-ac-source` | `collection`\*, `title`, `limit` (5), `show-on` (`query`\|`empty`\|`always`), `search-fields`, `filter`, `sort`, `app-id`/`api-key` override; child `<template>` | — | Inert config holder; registers up to its `sparq-autocomplete`; `transformItems`/`renderItem` properties |
 | `sparq-ssr` | `for` | `sparq:takeover` | Wraps server-rendered HTML; hides on first successful render (§8) |
 | `sparq-searchbox` | `placeholder`, `autofocus`, `suggestions`, `min-chars` (1), `for` | `sparq:query-change` (via provider) | ARIA combobox when suggestions active |
 | `sparq-items` | child `<template>`, `empty-text`, `skeleton` (default true), `for` | `sparq:item-click` | Items in light DOM (§7); skeleton placeholders + height retention (§17) |
@@ -351,6 +353,7 @@ Consequences: components do **not** auto-inherit the page font (pages opt in via
 --sparq-color-primary, --sparq-color-primary-contrast
 --sparq-color-border, --sparq-color-focus, --sparq-color-error
 --sparq-radius, --sparq-radius-sm, --sparq-spacing, --sparq-shadow-popup
+--sparq-z-popup (autocomplete panel z-index), --sparq-ac-active-bg
 ```
 
 ```html

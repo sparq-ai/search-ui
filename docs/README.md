@@ -16,6 +16,7 @@ Build a complete search frontend for [Sparq.ai](https://sparq.ai) on any HTML pa
 | Tag | Purpose |
 |---|---|
 | [`<sparq-search>`](./components/sparq-search.md) | Provider — connects to your Sparq collection; wraps all widgets |
+| [`<sparq-autocomplete>`](./components/sparq-autocomplete.md) | Federated multi-source autocomplete on any search input (with `<sparq-ac-source>` sections) |
 | [`<sparq-ssr>`](./components/sparq-ssr.md) | Wraps server-rendered HTML that the JS render takes over |
 | [`<sparq-searchbox>`](./components/sparq-searchbox.md) | Query input with optional suggestions dropdown |
 | [`<sparq-items>`](./components/sparq-items.md) | Results list with customer-defined templates |

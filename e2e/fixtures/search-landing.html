@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>e2e search landing</title>
+</head>
+<body>
+  <h1 id="landing">Search landing</h1>
+  <div id="q"></div>
+  <script>
+    document.getElementById('q').textContent = new URLSearchParams(location.search).get('q') || '(none)';
+  </script>
+</body>
+</html>

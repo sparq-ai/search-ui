@@ -26,9 +26,9 @@ Unique to search-ui (no store-ui counterpart): `<sparq-ssr>` SEO takeover, two-w
 
 | Priority | Item | What it is (store-ui source) | Notes / dependencies | Effort |
 |---|---|---|---|---|
-| ☐ | **External-input adapter** | Let a theme's *existing* search input drive the search (`SqSearchListener`) + an autocomplete panel anchored to it (`SqDropdown`) | Highest-leverage for Shopify themes that keep their own header search box. New `sparq-input-listener` + anchored-panel mode | M |
-| ☐ | **Popular searches** | Suggestions sourced from a dedicated collection (`SqPopularSearch`, `PopularSearchProcessor`, `popularCollectionId`) | Needs the popular-searches collection convention from the backend; fits the existing `suggestionsSource` hook as a built-in | S–M |
-| ☐ | **Merchandising redirects** | Keyword → URL redirect on Enter (`SqRedirects`, `RedirectProcessor`, `redirectsCollectionId`), internal/external | Backend collection convention; hook into searchbox submit | S–M |
+| ☑ shipped | **External-input adapter** | Let a theme's *existing* search input drive the search (`SqSearchListener`) + an autocomplete panel anchored to it (`SqDropdown`) | Done 2026-07-05: `<sparq-autocomplete input="selector">` — federated multi-source panel, delegated listeners survive theme re-renders, non-destructive ARIA | M |
+| ☑ shipped | **Popular searches** | Suggestions sourced from a dedicated collection (`SqPopularSearch`, `PopularSearchProcessor`, `popularCollectionId`) | Done 2026-07-05: `<sparq-ac-source show-on="empty" collection="POPULAR_ID">` — any collection becomes a popular-searches section on empty input | S–M |
+| ☐ | **Merchandising redirects** | Keyword → URL redirect on Enter (`SqRedirects`, `RedirectProcessor`, `redirectsCollectionId`), internal/external | Backend collection convention. **Seam ready:** `submitQuery()` in `packages/components/src/autocomplete/SparqAutocomplete.ts` — every Enter/view-all navigation funnels through it | S–M |
 | ☐ | **Page-size selector widget** | User-facing per-page dropdown (`SqPerPage`) | Controller already supports `setItemsPerPage`; widget only | S |
 | ☑ shipped | **True dual-thumb range slider** | Slider UI with min/max inputs, prefix/suffix, debounce (`SqSlider`) | Done 2026-07-05: track-level pointer handling (nearest-thumb pick, works on all engines incl. Firefox), keyboard/AT via native inputs, bounds-freeze policy, full-span-clears-filter | M |
 | ☐ | **Prev/Next pager mode** | Minimal two-button pager (`SqPrevNext`) | Attribute/variant on `sparq-pagination` | S |

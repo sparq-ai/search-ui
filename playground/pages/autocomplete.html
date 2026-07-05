@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Autocomplete — Sparq Search UI</title>
+  <script src="/mock-data.js"></script>
+  <script type="module" src="/sparq-entry.ts"></script>
+  <style>
+    body { margin: 0; font-family: system-ui, sans-serif; }
+    header { display: flex; align-items: center; gap: 24px; padding: 14px 24px; background: #111827; color: #f9fafb; }
+    header .logo { font-weight: 700; }
+    /* This input belongs to the "theme" — sparq-autocomplete only attaches to it. */
+    #theme-search { width: 340px; padding: 9px 12px; border-radius: 8px; border: none; font: inherit; }
+    main { max-width: 720px; margin: 40px auto; padding: 0 20px; }
+
+    /* Section item templates are the page's own light-DOM markup: */
+    .ac-product { display: flex; gap: 12px; align-items: center; text-decoration: none; color: #111; }
+    .ac-product .swatch { width: 36px; height: 36px; border-radius: 8px; background: #eef2ff; display: flex; align-items: center; justify-content: center; }
+    .ac-product .price { margin-left: auto; font-weight: 700; color: #059669; }
+    .ac-cat, .ac-page { text-decoration: none; color: #2563eb; }
+    .ac-popular { background: none; border: none; font: inherit; color: #374151; cursor: pointer; padding: 0; }
+    .ac-popular::before { content: '↗ '; color: #9ca3af; }
+  </style>
+</head>
+<body>
+  <header>
+    <span class="logo">ACME Store</span>
+    <form action="/pages/facets.html">
+      <input id="theme-search" name="q" type="text" placeholder="Search the store…" />
+    </form>
+  </header>
+
+  <sparq-autocomplete input="#theme-search" search-url="/pages/facets.html" api-host="mock:">
+    <sparq-ac-source title="Popular searches" collection="POPULAR" limit="5" show-on="empty">
+      <template><button type="button" class="ac-popular">{{query}}</button></template>
+    </sparq-ac-source>
+
+    <sparq-ac-source title="Products" collection="products" limit="4" search-fields="name, brand">
+      <template>
+        <a class="ac-product" href="{{url}}">
+          <span class="swatch">👟</span>
+          <span>{{name}}</span>
+          <span class="price">${{price}}</span>
+        </a>
+      </template>
+    </sparq-ac-source>
+
+    <sparq-ac-source title="Categories" collection="CATEGORIES" limit="4">
+      <template><a class="ac-cat" href="{{url}}">{{title}}</a></template>
+    </sparq-ac-source>
+
+    <sparq-ac-source title="Pages" collection="PAGES" limit="3">
+      <template><a class="ac-page" href="{{url}}">{{title}}</a></template>
+    </sparq-ac-source>
+  </sparq-autocomplete>
+
+  <main>
+    <h1>Federated autocomplete</h1>
+    <p>The search box above belongs to the "theme" header — <code>&lt;sparq-autocomplete input="#theme-search"&gt;</code> only attaches to it.</p>
+    <ul>
+      <li><strong>Focus the empty box</strong> → popular searches (the <code>show-on="empty"</code> section).</li>
+      <li><strong>Type "nike"</strong> → products, categories, and pages sections — each with different markup from its own <code>&lt;template&gt;</code>.</li>
+      <li><strong>Arrow keys</strong> traverse every section; Enter follows the active item; Enter with nothing active goes to the full search page.</li>
+      <li>Clicking a popular search fires <code>sparq:ac-select</code> (see the console).</li>
+    </ul>
+  </main>
+
+  <script>
+    document.addEventListener('sparq:ac-select', function (e) {
+      console.log('[demo] sparq:ac-select', e.detail);
+      if (e.detail.source.collection === 'POPULAR') {
+        location.href = '/pages/facets.html?q=' + encodeURIComponent(e.detail.item.query);
+      }
+    });
+  </script>
+</body>
+</html>

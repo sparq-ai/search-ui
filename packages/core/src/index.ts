@@ -28,6 +28,18 @@ export {
 export { buildRequest, canonicalKey, type RegisteredFacets } from './controller/requestBuilder';
 export { LruCache } from './controller/cache';
 
+export {
+  AutocompleteController,
+  modeForInput,
+  sourceActiveInMode,
+  type AcMode,
+  type AcShowOn,
+  type AcSourceConfig,
+  type AcSourceState,
+  type AutocompleteControllerOptions,
+  type AutocompleteState,
+} from './controller/AutocompleteController';
+
 export { compileItemTemplate, renderBlank, type ItemRenderer } from './template/compileItemTemplate';
 export { isSafeUrl } from './template/sanitize';
 

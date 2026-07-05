@@ -1,23 +1,13 @@
 import {
   SearchController,
   attachUrlSync,
-  createMockClient,
-  createSparqClient,
-  type Item,
   type SearchHooks,
-  type SearchRequest,
   type SparqClient,
 } from '@sparq/search-core';
 import { parseBoolAttr, parseListAttr, parseNumAttr } from '../attrs';
 import { dispatchSparqEvent } from '../events';
-import { getGlobalClient, getGlobalHooks, mergeHooks } from '../config';
-
-declare global {
-  interface Window {
-    /** Playground/demo hook: plain global so it can be set before the CDN script loads. */
-    __SPARQ_MOCK__?: { data: Item[]; delayMs?: number; suggestions?: string[] };
-  }
-}
+import { getGlobalHooks, mergeHooks } from '../config';
+import { createLazyClient } from '../clientResolution';
 
 /**
  * <sparq-search> — the provider. Deliberately a PLAIN custom element (no Vue):
@@ -32,7 +22,6 @@ export class SparqSearchElement extends HTMLElement {
   client: SparqClient | null = null;
 
   private elementHooks: SearchHooks = {};
-  private resolvedClient: SparqClient | null = null;
   private detachUrlSync: (() => void) | null = null;
   private unsubs: (() => void)[] = [];
 
@@ -59,7 +48,7 @@ export class SparqSearchElement extends HTMLElement {
       console.error('[sparq] <sparq-search> requires a collection="..." attribute.');
     }
 
-    const controller = new SearchController(this.lazyClient(), {
+    const controller = new SearchController(createLazyClient(this), {
       collection,
       itemsPerPage: parseNumAttr(this.getAttribute('items-per-page'), 20),
       debounceMs: parseNumAttr(this.getAttribute('debounce'), 200),
@@ -100,7 +89,6 @@ export class SparqSearchElement extends HTMLElement {
       this.detachUrlSync = null;
       this.controller?.dispose();
       this.controller = null;
-      this.resolvedClient = null;
     });
   }
 
@@ -122,57 +110,5 @@ export class SparqSearchElement extends HTMLElement {
         ? window.requestIdleCallback(cb, { timeout: 2000 })
         : setTimeout(cb, 1); // Safari fallback
     requestAnimationFrame(() => idle(() => this.controller?.start()));
-  }
-
-  /**
-   * Client resolution is lazy (per call) so host pages can set overrides in any
-   * order relative to script load: element property > global setClient() >
-   * api-host="mock:" > the real Sparq adapter.
-   */
-  private lazyClient(): SparqClient {
-    const resolve = (): SparqClient => {
-      if (this.client) return this.client;
-      const global = getGlobalClient();
-      if (global) return global;
-      if (this.resolvedClient) return this.resolvedClient;
-
-      const apiHost = this.getAttribute('api-host');
-      if (apiHost?.startsWith('mock:')) {
-        const mock = window.__SPARQ_MOCK__;
-        if (!mock) {
-          throw {
-            type: 'client',
-            message:
-              '[sparq] api-host="mock:" needs mock data: set window.__SPARQ_MOCK__ = { data: [...] } before searching.',
-            retryable: false,
-          };
-        }
-        this.resolvedClient = createMockClient(mock.data, {
-          delayMs: mock.delayMs,
-          suggestions: mock.suggestions,
-        });
-        return this.resolvedClient;
-      }
-
-      const appId = this.getAttribute('app-id');
-      const apiKey = this.getAttribute('api-key');
-      if (!appId || !apiKey) {
-        throw {
-          type: 'auth',
-          message: '[sparq] <sparq-search> needs app-id and api-key attributes (or a client set via JS).',
-          retryable: false,
-        };
-      }
-      this.resolvedClient = createSparqClient({ appId, apiKey, host: apiHost ?? undefined });
-      return this.resolvedClient;
-    };
-
-    return {
-      search: (req: SearchRequest, opts?: { signal?: AbortSignal }) => resolve().search(req, opts),
-      suggest: async (query: string, opts?: { signal?: AbortSignal }) => {
-        const client = resolve();
-        return client.suggest ? client.suggest(query, opts) : [];
-      },
-    };
   }
 }

@@ -1,6 +1,8 @@
 import { defineCustomElement, type Component } from 'vue';
 import { SparqSearchElement } from './provider/SparqSearch';
 import { SparqSsrElement } from './provider/SparqSsr';
+import { SparqAutocompleteElement } from './autocomplete/SparqAutocomplete';
+import { SparqAcSourceElement } from './autocomplete/SparqAcSource';
 import { RESET_CSS } from './styles/reset';
 import { ITEMS_SHARED_CSS } from './widgets/itemsShared';
 import SearchBox from './widgets/SearchBox.ce.vue';
@@ -32,6 +34,8 @@ export function register(): void {
   }
   customElements.define('sparq-search', SparqSearchElement);
   customElements.define('sparq-ssr', SparqSsrElement);
+  customElements.define('sparq-autocomplete', SparqAutocompleteElement);
+  customElements.define('sparq-ac-source', SparqAcSourceElement);
   customElements.define('sparq-searchbox', toElement(SearchBox));
   customElements.define('sparq-items', toElement(Items, [ITEMS_SHARED_CSS]));
   customElements.define('sparq-items-infinite', toElement(ItemsInfinite, [ITEMS_SHARED_CSS]));

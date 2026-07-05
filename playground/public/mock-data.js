@@ -24,6 +24,26 @@
   }
   window.__SPARQ_MOCK__ = {
     data: data,
+    // Per-collection datasets: federated autocomplete sections query these by
+    // collection id; 'products' keeps the classic pages working.
+    collections: {
+      products: data,
+      POPULAR: [
+        { query: 'nike runner' }, { query: 'trail shoes' }, { query: 'adidas pulse' },
+        { query: 'brooks dash' }, { query: 'asics storm' },
+      ],
+      CATEGORIES: [
+        { title: 'Road running', url: '#road' },
+        { title: 'Trail running', url: '#trail' },
+        { title: 'Track spikes', url: '#track' },
+        { title: 'Casual sneakers', url: '#casual' },
+      ],
+      PAGES: [
+        { title: 'Shipping & returns', url: '#shipping' },
+        { title: 'Size guide', url: '#sizes' },
+        { title: 'About us', url: '#about' },
+      ],
+    },
     delayMs: 120,
     suggestions: [
       'nike runner', 'nike glide', 'adidas pulse', 'asics storm',
