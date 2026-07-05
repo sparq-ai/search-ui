@@ -23,6 +23,20 @@ Build a complete search frontend for [Sparq.ai](https://sparq.ai) on a plain HTM
 
 See [ARCHITECTURE.md](./ARCHITECTURE.md) for the full design: layer model, headless core, adapter contract, hooks, CSS isolation guarantees, Core Web Vitals playbook, and roadmap.
 
+## Using the committed build (`lib/`)
+
+Every merge to `main` (after CI passes) refreshes a ready-to-include build: [`lib/sparq.js`](./lib/sparq.js) plus a pre-compressed `lib/sparq.js.gz`. Drop it into any HTML page:
+
+```html
+<!-- self-hosted -->
+<script src="/path/to/sparq.js" defer></script>
+
+<!-- or straight from GitHub via jsDelivr -->
+<script src="https://cdn.jsdelivr.net/gh/sparq-ai/search-ui@main/lib/sparq.js" defer></script>
+```
+
+Serve the `.gz` variant with `Content-Encoding: gzip` if your host doesn't compress on the fly.
+
 ## Development
 
 ```sh

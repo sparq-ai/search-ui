@@ -77,3 +77,50 @@ jobs:
           name: playwright-report-${{ matrix.browser }}
           path: playwright-report/
           retention-days: 7
+
+  # On every merge to main (after all tests pass), refresh the committed
+  # ready-to-include build under lib/ — plain sparq.js + sparq.js.gz.
+  publish-lib:
+    name: Publish lib/ build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [unit, e2e]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Build bundles
+        run: pnpm build
+
+      - name: Refresh lib/
+        # gzip -n omits name+timestamp so identical builds are byte-identical
+        run: |
+          mkdir -p lib
+          cp packages/components/dist/sparq.js lib/sparq.js
+          gzip -9 -n -c lib/sparq.js > lib/sparq.js.gz
+
+      - name: Commit lib/ if changed
+        run: |
+          git add lib
+          if git diff --cached --quiet; then
+            echo "lib/ unchanged — nothing to commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: refresh lib/ build [skip ci]"
+          git pull --rebase origin main
+          git push origin main
