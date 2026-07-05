@@ -1,6 +1,9 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Core Web Vitals (ARCHITECTURE §17)', () => {
+  // The layout-shift PerformanceObserver entry type is Chromium-only.
+  test.skip(({ browserName }) => browserName !== 'chromium', 'layout-shift API is Chromium-only');
+
   test('skeletons + height retention keep CLS under 0.05', async ({ page }) => {
     await page.goto('/e2e/fixtures/cls.html');
 

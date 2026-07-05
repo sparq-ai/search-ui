@@ -27,5 +27,10 @@ export default defineConfig({
     url: 'http://127.0.0.1:4517/e2e/fixtures/basic.html',
     reuseExistingServer: true,
   },
-  projects: [{ name: 'chromium', use: { browserName: 'chromium' } }],
+  // All three engines = Chrome/Edge (chromium), Safari (webkit), Firefox.
+  projects: [
+    { name: 'chromium', use: { browserName: 'chromium' } },
+    { name: 'firefox', use: { browserName: 'firefox' } },
+    { name: 'webkit', use: { browserName: 'webkit' } },
+  ],
 });

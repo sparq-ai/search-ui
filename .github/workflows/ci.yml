@@ -37,8 +37,13 @@ jobs:
         run: pnpm test
 
   e2e:
-    name: E2E (built CDN bundle)
+    name: E2E (${{ matrix.browser }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # chromium = Chrome/Edge engine, webkit = Safari engine
+        browser: [chromium, firefox, webkit]
     steps:
       - uses: actions/checkout@v4
 
@@ -56,18 +61,19 @@ jobs:
         run: pnpm build
 
       - name: Bundle size budget (≤70 kB gzip)
+        if: matrix.browser == 'chromium'
         run: pnpm size
 
       - name: Install Playwright
-        run: pnpm exec playwright install --with-deps chromium
+        run: pnpm exec playwright install --with-deps ${{ matrix.browser }}
 
       - name: E2E tests
-        run: pnpm exec playwright test -c e2e/playwright.config.ts
+        run: pnpm exec playwright test -c e2e/playwright.config.ts --project=${{ matrix.browser }}
 
       - name: Upload Playwright report
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
+          name: playwright-report-${{ matrix.browser }}
           path: playwright-report/
           retention-days: 7

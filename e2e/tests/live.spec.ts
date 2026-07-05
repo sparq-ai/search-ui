@@ -14,6 +14,8 @@ const collection = process.env.SPARQ_COLLECTION;
 
 test.describe('live API smoke', () => {
   test.skip(!appId || !apiKey || !collection, 'SPARQ_APP_ID / SPARQ_API_KEY / SPARQ_COLLECTION not set');
+  // One engine is enough for the external-API smoke — be polite to the live store.
+  test.skip(({ browserName }) => browserName !== 'chromium', 'live smoke runs on chromium only');
 
   test('searches a real store end-to-end through the built bundle', async ({ page }) => {
     const params = new URLSearchParams({ appId: appId!, apiKey: apiKey!, collection: collection! });

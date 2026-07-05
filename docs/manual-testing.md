@@ -84,7 +84,7 @@ http://127.0.0.1:4517/e2e/fixtures/live.html?appId=YOUR_APP_ID&apiKey=YOUR_SEARC
 - [ ] **Events**: in the console — `document.addEventListener('sparq:search', e => console.log(e.detail))` — every search's payload flows by
 - [ ] **Programmatic control**: `document.querySelector('sparq-search').controller.setQuery('batman')` from the console drives the UI
 - [ ] **CWV**: run Lighthouse on `http://127.0.0.1:4517/e2e/fixtures/cls.html` — CLS ≈ 0; on Slow 3G you should see skeleton placeholders sized like real items, and no layout jump when results land
-- [ ] **Other browsers**: repeat a quick pass in Safari and Firefox (support floor: Safari 13.1+, Firefox 78+)
+- [ ] **Other browsers**: the automated E2E suite already runs on Chromium, Firefox, and WebKit (Safari engine) — `pnpm e2e` locally or per-browser CI jobs. A quick manual pass in real Safari/Firefox is still worthwhile for visual polish (support floor: Safari 13.1+, Firefox 78+)
 
 ## When something looks wrong
 
