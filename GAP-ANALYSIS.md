@@ -4,6 +4,25 @@
 
 **How to use:** set the **Priority** column (P0/P1/P2/—) and tick items off as they ship. Effort: S ≈ ≤1 day, M ≈ 2–4 days, L ≈ 1 week+.
 
+**Status (updated 2026-07-05): 7 shipped · 17 pending.** Tier 1 is 3/6 done, Tier 2 is 4/5 done; Tiers 3–4 not started (by design — see sequencing).
+
+## Pending items at a glance
+
+| # | Item | Tier | Effort | Why it might be next |
+|---|---|---|---|---|
+| 1 | Merchandising redirects | 1 | S–M | `submitQuery()` seam already built; just needs the backend redirects-collection convention + a lookup |
+| 2 | Page-size selector widget | 1 | S | Controller support exists; widget only — quick win |
+| 3 | Prev/Next pager mode | 1 | S | Attribute variant on `sparq-pagination` — quick win |
+| 4 | Responsive pagination meta-config | 1 | S–M | Decide: CSS guidance vs `mode-mobile` attribute |
+| 5 | Hierarchical menu facet | 2 | L | Last Tier-2 item; needs `>>>` path parsing + URL serialization design |
+| 6–12 | Shopify commerce pack (7 items) | 3 | S→L | Start as `@sparq/search-ui-shopify` when a real migration is scheduled |
+| 13 | Analytics adapters (Sparq + GA4/GTM) | 4 | M | Events already carry payloads; highest-value Tier-4 item |
+| 14 | i18n / translations config | 4 | S–M | Partially covered by `transformValues` today |
+| 15 | Per-collection behavior | 4 | M | Redesign, don't port (store-ui's deepest coupling) |
+| 16 | "Sync in progress" empty state | 4 | S | Adapter-side detection + `slot="empty"` message |
+| 17 | Powered-by branding | 4 | S | Trivial |
+| 18 | External loader removal | 4 | S | Possibly unnecessary given `<sparq-ssr>` — decide before building |
+
 ---
 
 ## 1. Already at parity (or better) — no action
@@ -73,11 +92,15 @@ Keep the core platform-neutral; ship these as a separate CDN bundle layered on t
 
 ---
 
-## 6. Suggested sequencing (before prioritization)
+## 6. Suggested sequencing (updated 2026-07-05)
 
-1. **Tier 1 first** — pure search UX, no platform coupling, unblocks non-Shopify customers too. External-input adapter is the single highest-leverage item for theme integrations.
-2. **Tier 2 next** — facet display modes are the most visible parity gap on real store pages.
-3. **Tier 3 as a separate package** — start once one real Shopify migration is scheduled; requirements will be concrete.
-4. **Tier 4 opportunistically** — analytics adapter first (events already exist), the rest as demand appears.
+The original Tier-1/Tier-2 first pass is largely done (dual-thumb slider, autocomplete/external-input, popular searches, all four facet display modes, rating facet, availability toggle). Recommended order for what remains:
+
+1. **Tier-1 quick wins in one batch** — page-size selector + prev/next pager (+ the responsive-pagination decision): all S-effort, all pure widgets over existing controller support. Roughly a day combined.
+2. **Merchandising redirects** — the last search-UX behavior gap. Blocked only on the backend redirects-collection convention; the client seam (`submitQuery()`) is ready, so agree the convention and it's small.
+3. **Analytics adapter** (Tier 4) — pull forward ahead of Tier 3: the `sparq:*` events already carry the payloads, and analytics matters for every customer regardless of platform.
+4. **Hierarchical menu facet** — the one L-effort item; schedule it when a customer with nested category taxonomies is in sight, since the URL-serialization design should be validated against real data.
+5. **Tier 3 as `@sparq/search-ui-shopify`** — start once one real Shopify migration is scheduled; requirements will be concrete.
+6. **Remaining Tier 4** as demand appears; decide (rather than default-build) the external-loader-removal and per-collection-behavior items.
 
 **Deliberately not ported:** `window.sq.config` global config injection (replaced by attributes + hooks), Tailwind/light-DOM styling (replaced by Shadow DOM isolation), dual ad-hoc GA wiring inside widgets (replaced by observe-only events + adapters), Pinia store exposure on `window` (replaced by `el.controller`).
