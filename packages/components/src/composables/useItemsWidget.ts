@@ -1,11 +1,5 @@
 import { computed, onBeforeUnmount, onMounted, watchEffect, type ComputedRef } from 'vue';
-import {
-  compileItemTemplate,
-  renderBlank,
-  type Item,
-  type ItemRenderer,
-  type SearchController,
-} from '@sparq/search-core';
+import { compileItemTemplate, renderBlank, type Item, type ItemRenderer } from '@sparq/search-core';
 import { parseBoolAttr } from '../attrs';
 import { dispatchSparqEvent } from '../events';
 import { useController } from './useController';

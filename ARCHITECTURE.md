@@ -279,14 +279,16 @@ Attribute conventions: kebab-case attrs ↔ camelCase props; boolean = attribute
 
 ## 10. Composables (internal)
 
-| Composable | Purpose |
+| Module | Purpose |
 |---|---|
 | `useController(reg)` | Provider discovery (§6), registration + symmetric teardown, `for` override, inert error path |
-| `useSearchState(controller, selector)` | Typed computed selectors over controller state |
-| `useHostEvents(host)` | Composed + bubbling `sparq:*` CustomEvent dispatch |
-| `useLightTemplate(host)` | Finds child `<template>`, compiles via the core engine |
-| `useCombobox(...)` | WAI-ARIA combobox keyboard navigation for suggestions |
+| `useItemsWidget(mode)` | Shared items engine: template compile, light-DOM rendering, skeletons, height retention, click delegation — used by both items widgets |
 | `useInfiniteSentinel(ref, cb)` | IntersectionObserver lifecycle for `auto` infinite scroll |
+| `findProviderFor(el)` | DOM-ancestor / `for="id"` provider resolution with retry + console diagnostics |
+| `events.ts` | `dispatchSparqEvent` — composed + bubbling `sparq:*` CustomEvent dispatch |
+| `attrs.ts` | Boolean/number/list/`value\|Label`/JSON attribute parsing conventions |
+
+(The suggestions combobox keyboard handling lives inline in `SearchBox.ce.vue` — it has a single consumer.)
 
 Public JS surface (everything else is internal): `window.SparqSearchUI { version, register(), setClient(), configure() }` and `el.controller`. Composables are not public API in v1; the headless path for JS users is `controller.subscribe()`.
 

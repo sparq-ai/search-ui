@@ -42,7 +42,6 @@ export default defineConfig(({ mode }) => {
       outDir: 'dist',
       emptyOutDir: !iife,
       minify: 'esbuild',
-      sourcemap: process.env.SPARQ_SOURCEMAP === '1',
       lib: iife
         ? {
             entry: 'src/cdn.ts',

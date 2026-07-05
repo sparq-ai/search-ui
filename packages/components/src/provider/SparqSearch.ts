@@ -85,7 +85,7 @@ export class SparqSearchElement extends HTMLElement {
     }
 
     if (parseBoolAttr(this.getAttribute('search-on-load'), true)) {
-      this.scheduleFirstSearch(controller);
+      this.scheduleFirstSearch();
     }
   }
 
@@ -108,7 +108,7 @@ export class SparqSearchElement extends HTMLElement {
    * With an SSR fallback the content is already on screen — defer the takeover
    * query past first paint so it never competes with LCP (ARCHITECTURE §17).
    */
-  private scheduleFirstSearch(controller: SearchController): void {
+  private scheduleFirstSearch(): void {
     const hasSsrFallback = this.querySelector('sparq-ssr') !== null;
     if (!hasSsrFallback) {
       // One macrotask later: widget registrations (microtasks queued during

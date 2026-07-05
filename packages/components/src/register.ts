@@ -2,6 +2,7 @@ import { defineCustomElement, type Component } from 'vue';
 import { SparqSearchElement } from './provider/SparqSearch';
 import { SparqSsrElement } from './provider/SparqSsr';
 import { RESET_CSS } from './styles/reset';
+import { ITEMS_SHARED_CSS } from './widgets/itemsShared';
 import SearchBox from './widgets/SearchBox.ce.vue';
 import Items from './widgets/Items.ce.vue';
 import ItemsInfinite from './widgets/ItemsInfinite.ce.vue';
@@ -12,10 +13,10 @@ import Range from './widgets/Range.ce.vue';
 import Refinements from './widgets/Refinements.ce.vue';
 import Stats from './widgets/Stats.ce.vue';
 
-function toElement(component: Component): CustomElementConstructor {
+function toElement(component: Component, extraStyles: string[] = []): CustomElementConstructor {
   const comp = component as Record<string, unknown> & { styles?: string[] };
   // Prepend the isolation firewall/reset to every shadow root (ARCHITECTURE §12).
-  const withReset = { ...comp, styles: [RESET_CSS, ...(comp.styles ?? [])] };
+  const withReset = { ...comp, styles: [RESET_CSS, ...extraStyles, ...(comp.styles ?? [])] };
   return defineCustomElement(withReset as unknown as Parameters<typeof defineCustomElement>[0]);
 }
 
@@ -32,8 +33,8 @@ export function register(): void {
   customElements.define('sparq-search', SparqSearchElement);
   customElements.define('sparq-ssr', SparqSsrElement);
   customElements.define('sparq-searchbox', toElement(SearchBox));
-  customElements.define('sparq-items', toElement(Items));
-  customElements.define('sparq-items-infinite', toElement(ItemsInfinite));
+  customElements.define('sparq-items', toElement(Items, [ITEMS_SHARED_CSS]));
+  customElements.define('sparq-items-infinite', toElement(ItemsInfinite, [ITEMS_SHARED_CSS]));
   customElements.define('sparq-filters', toElement(Filters));
   customElements.define('sparq-sort', toElement(Sort));
   customElements.define('sparq-pagination', toElement(Pagination));
