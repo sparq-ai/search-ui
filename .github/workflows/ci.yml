@@ -111,6 +111,7 @@ jobs:
           mkdir -p lib
           cp packages/components/dist/sparq.js lib/sparq.js
           gzip -9 -n -c lib/sparq.js > lib/sparq.js.gz
+          node -e "const z=require('zlib'),f=require('fs');f.writeFileSync('lib/sparq.js.br',z.brotliCompressSync(f.readFileSync('lib/sparq.js'),{params:{[z.constants.BROTLI_PARAM_QUALITY]:11}}))"
 
       - name: Commit lib/ if changed
         run: |
