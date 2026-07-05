@@ -40,11 +40,11 @@ store-ui supports 9 facet UI types (`UserInterfaceType`); search-ui currently ha
 
 | Priority | Item | What it is (store-ui source) | Notes / dependencies | Effort |
 |---|---|---|---|---|
-| ☐ | **Single-select + pill modes** | Radio-style and pill-button facet rendering (`SqFilter` SingleSelect/Pill) | `mode` attribute on `sparq-filters` | S |
-| ☐ | **Color swatch / color list facets** | Hex/gradient/multicolor/image swatches with color-group maps (`SqPalette`, `AppHelper.getHexCode`, `config.colorGroups`) | Needs a color-map config surface (JSON attribute or hook) | M |
-| ☐ | **Star-rating facet** | Synthesized 0–5 bucket ranges over a rating field (`AppBoot`/`QueryParser` StarRating) | Client-side bucket synthesis onto numeric filters; star display component | M |
+| ☑ shipped | ~~**Single-select + pill modes**~~ | ~~Radio-style and pill-button facet rendering (`SqFilter` SingleSelect/Pill)~~ | Done 2026-07-05: `mode="single"` (radio semantics, click-selected-clears) and `mode="pill"` on `sparq-filters` | S |
+| ☑ shipped | ~~**Color swatch / color list facets**~~ | ~~Hex/gradient/multicolor/image swatches with color-group maps (`SqPalette`, `AppHelper.getHexCode`, `config.colorGroups`)~~ | Done 2026-07-05: `mode="swatch"` / `mode="color-list"` + `colors` JSON map/property; `a/b` gradients, `*` multi, `#` clear, hatched-unknown fallback | M |
+| ☑ shipped | ~~**Star-rating facet**~~ | ~~Synthesized 0–5 bucket ranges over a rating field (`AppBoot`/`QueryParser` StarRating)~~ | Done 2026-07-05: `<sparq-rating>` — "N & up" rows via numeric filters (`r.attr=N-` in URLs); simpler than store-ui's bucket synthesis, same UX | M |
 | ☐ | **Hierarchical menu facet** | Up to 3-level nested category tree from `>>>`-delimited facet values (`SqFilter` Menu, `ResultParser`) | Also needs URL serialization for paths | L |
-| ☐ | **In-stock / availability toggle** | Single-toggle facet (`system_availability` special case) | Thin preset over existing facet filters | S |
+| ☑ shipped | ~~**In-stock / availability toggle**~~ | ~~Single-toggle facet (`system_availability` special case)~~ | Done 2026-07-05: `<sparq-toggle attribute value label>` — generalized single-value switch with live count | S |
 
 ## 4. Tier 3 — Shopify commerce pack (new optional package: `@sparq/search-ui-shopify`)
 

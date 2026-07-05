@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>e2e facet modes</title>
+  <script>
+    (function () {
+      var colors = ['Red', 'Blue', 'Storm', 'Multi', 'Clear', 'Sparkle'];
+      var sizes = ['S', 'M', 'L', 'XL'];
+      var genders = ['Men', 'Women', 'Kids'];
+      var data = [];
+      var id = 1;
+      for (var c = 0; c < colors.length; c++) {
+        for (var s = 0; s < sizes.length; s++) {
+          data.push({
+            id: id,
+            name: 'Shoe ' + id,
+            color: colors[c],
+            size: sizes[s],
+            gender: genders[id % 3],
+            rating: (id % 5) + 1,           // 1..5
+            availability: id % 4 === 0 ? 'out of stock' : 'in stock',
+            price: 50 + id,
+          });
+          id++;
+        }
+      }
+      window.__SPARQ_MOCK__ = { data: data };
+    })();
+  </script>
+  <script src="/packages/components/dist/sparq.js" defer></script>
+</head>
+<body>
+  <sparq-search collection="products" api-host="mock:" routing items-per-page="10">
+    <sparq-searchbox placeholder="Search…"></sparq-searchbox>
+    <sparq-refinements clear-label="Clear all"></sparq-refinements>
+    <sparq-toggle attribute="availability" value="in stock" label="In stock only"></sparq-toggle>
+
+    <sparq-filters id="f-gender" attribute="gender" header="Gender" mode="single"></sparq-filters>
+    <sparq-filters id="f-size" attribute="size" header="Size" mode="pill"></sparq-filters>
+    <sparq-filters
+      id="f-color-swatch"
+      attribute="color"
+      header="Color"
+      mode="swatch"
+      colors='{"Storm":"black/white","Multi":"*","Clear":"#"}'
+    ></sparq-filters>
+    <sparq-filters
+      id="f-color-list"
+      attribute="color"
+      header="Color list"
+      mode="color-list"
+      colors='{"Storm":"black/white","Multi":"*","Clear":"#"}'
+    ></sparq-filters>
+    <sparq-rating attribute="rating" header="Rating"></sparq-rating>
+
+    <sparq-stats></sparq-stats>
+    <sparq-items>
+      <template><article class="result-card">{{name}} · {{color}} · {{size}} · r<span class="r">{{rating}}</span></article></template>
+    </sparq-items>
+  </sparq-search>
+</body>
+</html>

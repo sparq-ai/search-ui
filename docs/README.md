@@ -21,7 +21,9 @@ Build a complete search frontend for [Sparq.ai](https://sparq.ai) on any HTML pa
 | [`<sparq-searchbox>`](./components/sparq-searchbox.md) | Query input with optional suggestions dropdown |
 | [`<sparq-items>`](./components/sparq-items.md) | Results list with customer-defined templates |
 | [`<sparq-items-infinite>`](./components/sparq-items-infinite.md) | Infinite-scroll / load-more results list |
-| [`<sparq-filters>`](./components/sparq-filters.md) | Checkbox facet list for one attribute |
+| [`<sparq-filters>`](./components/sparq-filters.md) | Facet list for one attribute — checkbox, single, pill, swatch, or color-list mode |
+| [`<sparq-rating>`](./components/sparq-rating.md) | "N stars & up" rating facet |
+| [`<sparq-toggle>`](./components/sparq-toggle.md) | Single-value on/off switch (e.g. in-stock only) |
 | [`<sparq-sort>`](./components/sparq-sort.md) | Sort-order select |
 | [`<sparq-pagination>`](./components/sparq-pagination.md) | Page navigation |
 | [`<sparq-range>`](./components/sparq-range.md) | Numeric min/max filter (e.g. price) |

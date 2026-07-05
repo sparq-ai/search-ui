@@ -10,13 +10,17 @@
   for (var b = 0; b < brands.length; b++) {
     for (var m = 0; m < models.length; m++) {
       var category = categories[(b + m) % categories.length];
+      var swatchColors = ['Red', 'Blue', 'Black', 'Storm', 'Multi', 'Clear'];
       data.push({
         id: id,
         name: brands[b] + ' ' + models[m] + ' ' + (100 + ((b * 7 + m * 13) % 900)),
         brand: brands[b],
         category: category,
+        gender: ['Men', 'Women', 'Kids'][id % 3],
+        color: swatchColors[(b * 3 + m) % swatchColors.length],
+        availability: id % 5 === 0 ? 'out of stock' : 'in stock',
         price: 60 + ((b * 31 + m * 17) % 140),
-        rating: 3 + ((b + m) % 3),
+        rating: 1 + ((b + m) % 5),
         url: '/products/' + id,
       });
       id++;

@@ -26,8 +26,17 @@
 
     <div class="layout">
       <aside>
+        <sparq-toggle attribute="availability" value="in stock" label="In stock only"></sparq-toggle>
         <sparq-filters attribute="brand" header="Brand" limit="4" show-more searchable></sparq-filters>
-        <sparq-filters attribute="category" header="Category" sort-by="alpha"></sparq-filters>
+        <sparq-filters attribute="category" header="Category" mode="pill"></sparq-filters>
+        <sparq-filters attribute="gender" header="Gender" mode="single"></sparq-filters>
+        <sparq-filters
+          attribute="color"
+          header="Color"
+          mode="swatch"
+          colors='{"Storm":"black/white","Multi":"*","Clear":"#"}'
+        ></sparq-filters>
+        <sparq-rating attribute="rating" header="Rating"></sparq-rating>
         <sparq-range attribute="price" prefix="$"></sparq-range>
       </aside>
       <main>

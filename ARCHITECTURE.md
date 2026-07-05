@@ -253,7 +253,9 @@ Customers server-render the search results HTML for the current URL; in browsers
 | `sparq-searchbox` | `placeholder`, `autofocus`, `suggestions`, `min-chars` (1), `for` | `sparq:query-change` (via provider) | ARIA combobox when suggestions active |
 | `sparq-items` | child `<template>`, `empty-text`, `skeleton` (default true), `for` | `sparq:item-click` | Items in light DOM (§7); skeleton placeholders + height retention (§17) |
 | `sparq-items-infinite` | same + `auto`, `load-more-text` | `sparq:item-click` | Appends via `accumulatedItems` |
-| `sparq-filters` | `attribute`\*, `limit` (10), `show-more`, `searchable`, `sort-by` (`count`\|`alpha`), `header`, `for` | `sparq:refine` (via provider) | Checkbox facet list; counts stay correct after selection (§4) |
+| `sparq-filters` | `attribute`\*, `mode` (`checkbox`\|`single`\|`pill`\|`swatch`\|`color-list`), `colors` (JSON value→code map; `a/b` gradient, `*` multi, `#` clear), `limit` (10), `show-more`, `searchable`, `sort-by` (`count`\|`alpha`), `header`, `for` | `sparq:refine` (via provider) | Facet list, 5 display modes; counts stay correct after selection (§4); `single` = radio semantics (click selected clears) |
+| `sparq-rating` | `attribute`\*, `max` (5), `and-up-label`, `header`, `for` | `sparq:refine` (via provider) | "N stars & up" rows → numeric filter `attribute >= N`; radio-group semantics |
+| `sparq-toggle` | `attribute`\*, `value`\*, `label`, `for` | `sparq:refine` (via provider) | Single on/off switch applying one facet value (availability); live count |
 | `sparq-sort` | `options`\* (`value\|Label` list), `label`, `for` | `sparq:refine` | Select dropdown |
 | `sparq-pagination` | `padding` (2), `show-first-last`, `for` | `sparq:page-change` | |
 | `sparq-range` | `attribute`\*, `min`, `max`, `step`, `prefix`, `for` | `sparq:refine` | Bounds auto-filled from `facetStats` |
@@ -354,6 +356,7 @@ Consequences: components do **not** auto-inherit the page font (pages opt in via
 --sparq-color-border, --sparq-color-focus, --sparq-color-error
 --sparq-radius, --sparq-radius-sm, --sparq-spacing, --sparq-shadow-popup
 --sparq-z-popup (autocomplete panel z-index), --sparq-ac-active-bg
+--sparq-rating-color (filled stars)
 ```
 
 ```html

@@ -12,8 +12,10 @@ import Filters from './widgets/Filters.ce.vue';
 import Sort from './widgets/Sort.ce.vue';
 import Pagination from './widgets/Pagination.ce.vue';
 import Range from './widgets/Range.ce.vue';
+import Rating from './widgets/Rating.ce.vue';
 import Refinements from './widgets/Refinements.ce.vue';
 import Stats from './widgets/Stats.ce.vue';
+import Toggle from './widgets/Toggle.ce.vue';
 
 function toElement(component: Component, extraStyles: string[] = []): CustomElementConstructor {
   const comp = component as Record<string, unknown> & { styles?: string[] };
@@ -43,8 +45,10 @@ export function register(): void {
   customElements.define('sparq-sort', toElement(Sort));
   customElements.define('sparq-pagination', toElement(Pagination));
   customElements.define('sparq-range', toElement(Range));
+  customElements.define('sparq-rating', toElement(Rating));
   customElements.define('sparq-refinements', toElement(Refinements));
   customElements.define('sparq-stats', toElement(Stats));
+  customElements.define('sparq-toggle', toElement(Toggle));
 
   // Safe timing signal for hook attachment from plain <script> tags (§11).
   document.dispatchEvent(new CustomEvent('sparq:ready'));
