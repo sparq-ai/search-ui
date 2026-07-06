@@ -10,7 +10,7 @@ import {
   type SparqClient,
   type UiState,
 } from '@sparq/search-core';
-import { parseNumAttr } from '../attrs';
+import { parseBoolAttr, parseNumAttr } from '../attrs';
 import { dispatchSparqEvent } from '../events';
 import { RESET_CSS } from '../styles/reset';
 import { createLazyClient } from '../clientResolution';
@@ -30,7 +30,6 @@ export interface AutocompleteHooks {
   transformRequest?: (req: SearchRequest, ctx: { uiState: UiState }) => SearchRequest | Promise<SearchRequest>;
 }
 
-const FALSE_STRINGS = new Set(['false', '0', 'off', 'no']);
 let instanceCounter = 0;
 
 /**
@@ -331,9 +330,10 @@ export class SparqAutocompleteElement extends HTMLElement {
       });
     });
 
-    // View-all footer (query mode only).
+    // View-all footer (query mode only); view-all="false" disables it
+    // (standard boolean-attr convention, see attrs.ts).
     const viewAllRaw = this.getAttribute('view-all');
-    const viewAllDisabled = viewAllRaw !== null && FALSE_STRINGS.has(viewAllRaw.trim().toLowerCase());
+    const viewAllDisabled = !parseBoolAttr(viewAllRaw, true);
     const showViewAll = !viewAllDisabled && mode === 'query' && totalSum > 0;
     this.viewAllEl.hidden = !showViewAll;
     if (showViewAll) {
