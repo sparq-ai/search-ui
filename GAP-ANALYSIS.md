@@ -4,7 +4,9 @@
 
 **How to use:** set the **Priority** column (P0/P1/P2/—) and tick items off as they ship. Effort: S ≈ ≤1 day, M ≈ 2–4 days, L ≈ 1 week+.
 
-**Status (updated 2026-07-05): 7 shipped · 17 pending.** Tier 1 is 3/6 done, Tier 2 is 4/5 done; Tiers 3–4 not started (by design — see sequencing).
+**Status (updated 2026-07-06): 7 shipped · 18 pending** (25 tracked items). Tier 1 is 3/7 done, Tier 2 is 4/5 done; Tiers 3 (7 items) and 4 (6 items) not started — by design, see sequencing.
+
+Shipped so far: dual-thumb range slider · federated autocomplete w/ external-input adapter · popular searches · single-select + pill facet modes · color swatch / color-list facets · star-rating facet · in-stock/availability toggle.
 
 ## Pending items at a glance
 

@@ -1,25 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { AutocompleteController, type AcSourceConfig, type SearchRequest, type SparqClient } from '../src';
-import { deferredClient, response, sleep, tick } from './helpers';
+import { deferredClient, recordingClient, response, sleep, tick } from './helpers';
 
 const SOURCES: AcSourceConfig[] = [
   { id: 'popular', collection: 'POPULAR', limit: 5, showOn: 'empty' },
   { id: 'products', collection: 'PRODUCTS', limit: 4 },
   { id: 'categories', collection: 'CATEGORIES', limit: 5 },
 ];
-
-function recordingAcClient(
-  respond: (req: SearchRequest) => ReturnType<typeof response> = () => response(),
-) {
-  const requests: SearchRequest[] = [];
-  const client: SparqClient = {
-    async search(req) {
-      requests.push(req);
-      return respond(req);
-    },
-  };
-  return { client, requests };
-}
 
 function make(client: SparqClient, overrides: Record<string, unknown> = {}) {
   return new AutocompleteController(client, {
@@ -34,7 +21,7 @@ const byId = (c: AutocompleteController, id: string) => c.state.sources.find((s)
 
 describe('mode + active-source resolution', () => {
   it('empty focus fires ONLY empty/always sources with query ""', async () => {
-    const { client, requests } = recordingAcClient();
+    const { client, requests } = recordingClient();
     const c = make(client);
     c.focus();
     await tick();
@@ -44,7 +31,7 @@ describe('mode + active-source resolution', () => {
   });
 
   it('typing ≥ min-chars fires query/always sources, not empty ones', async () => {
-    const { client, requests } = recordingAcClient();
+    const { client, requests } = recordingClient();
     const c = make(client);
     c.setInput('sh');
     await sleep(30);
@@ -54,7 +41,7 @@ describe('mode + active-source resolution', () => {
   });
 
   it('an "always" source runs in both modes', async () => {
-    const { client, requests } = recordingAcClient();
+    const { client, requests } = recordingClient();
     const c = make(client, {
       sources: [...SOURCES, { id: 'pages', collection: 'PAGES', showOn: 'always' }],
     });
@@ -67,7 +54,7 @@ describe('mode + active-source resolution', () => {
   });
 
   it('the inactive band (0 < len < min-chars) fires nothing and clears sections', async () => {
-    const { client, requests } = recordingAcClient(() => response({ items: [{ id: 1 }], totalItems: 1 }));
+    const { client, requests } = recordingClient(() => response({ items: [{ id: 1 }], totalItems: 1 }));
     const c = make(client);
     c.setInput('sh');
     await sleep(30);
@@ -84,7 +71,7 @@ describe('mode + active-source resolution', () => {
 
 describe('debounce + request shape', () => {
   it('a keystroke burst produces ONE run: one request per active source', async () => {
-    const { client, requests } = recordingAcClient();
+    const { client, requests } = recordingClient();
     const c = make(client);
     c.setInput('s');
     c.setInput('sh');
@@ -96,7 +83,7 @@ describe('debounce + request shape', () => {
   });
 
   it('clearing the input settles IMMEDIATELY (empty mode must not lag)', async () => {
-    const { client, requests } = recordingAcClient();
+    const { client, requests } = recordingClient();
     const c = make(client);
     c.setInput('');
     await tick();
@@ -104,7 +91,7 @@ describe('debounce + request shape', () => {
   });
 
   it('source config maps onto the canonical request', async () => {
-    const { client, requests } = recordingAcClient();
+    const { client, requests } = recordingClient();
     const c = make(client, {
       sources: [
         {
@@ -187,7 +174,7 @@ describe('race handling + aborts', () => {
 
 describe('cache', () => {
   it('serves a repeated settled query without network; refocus of empty state is free', async () => {
-    const { client, requests } = recordingAcClient();
+    const { client, requests } = recordingClient();
     const c = make(client);
     c.focus();
     await tick();
@@ -204,7 +191,7 @@ describe('cache', () => {
   });
 
   it('refresh() busts the cache', async () => {
-    const { client, requests } = recordingAcClient();
+    const { client, requests } = recordingClient();
     const c = make(client);
     c.focus();
     await tick();
@@ -214,8 +201,8 @@ describe('cache', () => {
   });
 
   it('per-source client overrides never share cache entries with the default client', async () => {
-    const shared = recordingAcClient(() => response({ items: [{ from: 'shared' }], totalItems: 1 }));
-    const override = recordingAcClient(() => response({ items: [{ from: 'override' }], totalItems: 1 }));
+    const shared = recordingClient(() => response({ items: [{ from: 'shared' }], totalItems: 1 }));
+    const override = recordingClient(() => response({ items: [{ from: 'override' }], totalItems: 1 }));
     const c = make(shared.client, {
       sources: [
         { id: 'a', collection: 'SAME' },
@@ -252,7 +239,7 @@ describe('failure isolation + hooks', () => {
   });
 
   it('per-source transformItems decorates (async, race-guarded)', async () => {
-    const { client } = recordingAcClient(() => response({ items: [{ id: 1 }], totalItems: 1 }));
+    const { client } = recordingClient(() => response({ items: [{ id: 1 }], totalItems: 1 }));
     const c = make(client, {
       sources: [
         {
@@ -271,7 +258,7 @@ describe('failure isolation + hooks', () => {
   });
 
   it('host transformRequest applies to every source request', async () => {
-    const { client, requests } = recordingAcClient();
+    const { client, requests } = recordingClient();
     const c = make(client, {
       transformRequest: (req: SearchRequest) => ({ ...req, filter: 'published = 1' }),
     });
@@ -283,7 +270,7 @@ describe('failure isolation + hooks', () => {
 
 describe('lifecycle', () => {
   it('setSources rebuilds state and re-runs the current mode', async () => {
-    const { client, requests } = recordingAcClient();
+    const { client, requests } = recordingClient();
     const c = make(client);
     c.setInput('sh');
     await sleep(30);
