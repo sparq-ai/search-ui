@@ -4,9 +4,9 @@
 
 **How to use:** set the **Priority** column (P0/P1/P2/—) and tick items off as they ship. Effort: S ≈ ≤1 day, M ≈ 2–4 days, L ≈ 1 week+.
 
-**Status (updated 2026-07-06): 7 shipped · 18 pending** (25 tracked items). Tier 1 is 3/7 done, Tier 2 is 4/5 done; Tiers 3 (7 items) and 4 (6 items) not started — by design, see sequencing.
+**Status (updated 2026-07-06): 8 shipped · 17 pending** (25 tracked items). Tier 1 is 3/7 done, **Tier 2 is complete (5/5)**; Tiers 3 (7 items) and 4 (6 items) not started — by design, see sequencing.
 
-Shipped so far: dual-thumb range slider · federated autocomplete w/ external-input adapter · popular searches · single-select + pill facet modes · color swatch / color-list facets · star-rating facet · in-stock/availability toggle.
+Shipped so far: dual-thumb range slider · federated autocomplete w/ external-input adapter · popular searches · single-select + pill facet modes · color swatch / color-list facets · star-rating facet · in-stock/availability toggle · hierarchical menu facet.
 
 ## Pending items at a glance
 
@@ -16,14 +16,13 @@ Shipped so far: dual-thumb range slider · federated autocomplete w/ external-in
 | 2 | Page-size selector widget | 1 | S | Controller support exists; widget only — quick win |
 | 3 | Prev/Next pager mode | 1 | S | Attribute variant on `sparq-pagination` — quick win |
 | 4 | Responsive pagination meta-config | 1 | S–M | Decide: CSS guidance vs `mode-mobile` attribute |
-| 5 | Hierarchical menu facet | 2 | L | Last Tier-2 item; needs `>>>` path parsing + URL serialization design |
-| 6–12 | Shopify commerce pack (7 items) | 3 | S→L | Start as `@sparq/search-ui-shopify` when a real migration is scheduled |
-| 13 | Analytics adapters (Sparq + GA4/GTM) | 4 | M | Events already carry payloads; highest-value Tier-4 item |
-| 14 | i18n / translations config | 4 | S–M | Partially covered by `transformValues` today |
-| 15 | Per-collection behavior | 4 | M | Redesign, don't port (store-ui's deepest coupling) |
-| 16 | "Sync in progress" empty state | 4 | S | Adapter-side detection + `slot="empty"` message |
-| 17 | Powered-by branding | 4 | S | Trivial |
-| 18 | External loader removal | 4 | S | Possibly unnecessary given `<sparq-ssr>` — decide before building |
+| 5–11 | Shopify commerce pack (7 items) | 3 | S→L | Start as `@sparq/search-ui-shopify` when a real migration is scheduled |
+| 12 | Analytics adapters (Sparq + GA4/GTM) | 4 | M | Events already carry payloads; highest-value Tier-4 item |
+| 13 | i18n / translations config | 4 | S–M | Partially covered by `transformValues` today |
+| 14 | Per-collection behavior | 4 | M | Redesign, don't port (store-ui's deepest coupling) |
+| 15 | "Sync in progress" empty state | 4 | S | Adapter-side detection + `slot="empty"` message |
+| 16 | Powered-by branding | 4 | S | Trivial |
+| 17 | External loader removal | 4 | S | Possibly unnecessary given `<sparq-ssr>` — decide before building |
 
 ---
 
@@ -64,7 +63,7 @@ store-ui supports 9 facet UI types (`UserInterfaceType`); search-ui currently ha
 | ☑ shipped | ~~**Single-select + pill modes**~~ | ~~Radio-style and pill-button facet rendering (`SqFilter` SingleSelect/Pill)~~ | Done 2026-07-05: `mode="single"` (radio semantics, click-selected-clears) and `mode="pill"` on `sparq-filters` | S |
 | ☑ shipped | ~~**Color swatch / color list facets**~~ | ~~Hex/gradient/multicolor/image swatches with color-group maps (`SqPalette`, `AppHelper.getHexCode`, `config.colorGroups`)~~ | Done 2026-07-05: `mode="swatch"` / `mode="color-list"` + `colors` JSON map/property; `a/b` gradients, `*` multi, `#` clear, hatched-unknown fallback | M |
 | ☑ shipped | ~~**Star-rating facet**~~ | ~~Synthesized 0–5 bucket ranges over a rating field (`AppBoot`/`QueryParser` StarRating)~~ | Done 2026-07-05: `<sparq-rating>` — "N & up" rows via numeric filters (`r.attr=N-` in URLs); simpler than store-ui's bucket synthesis, same UX | M |
-| ☐ | **Hierarchical menu facet** | Up to 3-level nested category tree from `>>>`-delimited facet values (`SqFilter` Menu, `ResultParser`) | Also needs URL serialization for paths | L |
+| ☑ shipped | ~~**Hierarchical menu facet**~~ | ~~Up to 3-level nested category tree from `>>>`-delimited facet values (`SqFilter` Menu, `ResultParser`)~~ | Done 2026-07-06: `<sparq-menu>` — drill-down tree over ancestor-chain facet values; URL paths needed no new serialization (existing `f.attr=` percent-encoding round-trips them) | L |
 | ☑ shipped | ~~**In-stock / availability toggle**~~ | ~~Single-toggle facet (`system_availability` special case)~~ | Done 2026-07-05: `<sparq-toggle attribute value label>` — generalized single-value switch with live count | S |
 
 ## 4. Tier 3 — Shopify commerce pack (new optional package: `@sparq/search-ui-shopify`)
@@ -101,8 +100,7 @@ The original Tier-1/Tier-2 first pass is largely done (dual-thumb slider, autoco
 1. **Tier-1 quick wins in one batch** — page-size selector + prev/next pager (+ the responsive-pagination decision): all S-effort, all pure widgets over existing controller support. Roughly a day combined.
 2. **Merchandising redirects** — the last search-UX behavior gap. Blocked only on the backend redirects-collection convention; the client seam (`submitQuery()`) is ready, so agree the convention and it's small.
 3. **Analytics adapter** (Tier 4) — pull forward ahead of Tier 3: the `sparq:*` events already carry the payloads, and analytics matters for every customer regardless of platform.
-4. **Hierarchical menu facet** — the one L-effort item; schedule it when a customer with nested category taxonomies is in sight, since the URL-serialization design should be validated against real data.
-5. **Tier 3 as `@sparq/search-ui-shopify`** — start once one real Shopify migration is scheduled; requirements will be concrete.
-6. **Remaining Tier 4** as demand appears; decide (rather than default-build) the external-loader-removal and per-collection-behavior items.
+4. **Tier 3 as `@sparq/search-ui-shopify`** — start once one real Shopify migration is scheduled; requirements will be concrete.
+5. **Remaining Tier 4** as demand appears; decide (rather than default-build) the external-loader-removal and per-collection-behavior items.
 
 **Deliberately not ported:** `window.sq.config` global config injection (replaced by attributes + hooks), Tailwind/light-DOM styling (replaced by Shadow DOM isolation), dual ad-hoc GA wiring inside widgets (replaced by observe-only events + adapters), Pinia store exposure on `window` (replaced by `el.controller`).

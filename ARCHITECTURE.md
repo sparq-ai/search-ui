@@ -254,6 +254,7 @@ Customers server-render the search results HTML for the current URL; in browsers
 | `sparq-items` | child `<template>`, `empty-text`, `skeleton` (default true), `for` | `sparq:item-click` | Items in light DOM (§7); skeleton placeholders + height retention (§17) |
 | `sparq-items-infinite` | same + `auto`, `load-more-text` | `sparq:item-click` | Appends via `accumulatedItems` |
 | `sparq-filters` | `attribute`\*, `mode` (`checkbox`\|`single`\|`pill`\|`swatch`\|`color-list`), `colors` (JSON value→code map; `a/b` gradient, `*` multi, `#` clear), `limit` (10), `show-more`, `searchable`, `sort-by` (`count`\|`alpha`), `header`, `for` | `sparq:refine` (via provider) | Facet list, 5 display modes; counts stay correct after selection (§4); `single` = radio semantics (click selected clears) |
+| `sparq-menu` | `attribute`\*, `separator` (`>>>`), `max-depth` (3), `header`, `for` | `sparq:refine` (via provider) | Hierarchical drill-down tree; data convention: items carry full ancestor chains, so exact-value facet filtering + per-level counts need no API changes; one selected path (click selected → parent) |
 | `sparq-rating` | `attribute`\*, `max` (5), `and-up-label`, `header`, `for` | `sparq:refine` (via provider) | "N stars & up" rows → numeric filter `attribute >= N`; radio-group semantics |
 | `sparq-toggle` | `attribute`\*, `value`\*, `label`, `for` | `sparq:refine` (via provider) | Single on/off switch applying one facet value (availability); live count |
 | `sparq-sort` | `options`\* (`value\|Label` list), `label`, `for` | `sparq:refine` | Select dropdown |
