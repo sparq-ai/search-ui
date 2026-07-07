@@ -59,6 +59,50 @@ describe('mockClient — faithful to backend semantics', () => {
   });
 });
 
+describe('mockClient — multi-value (array) fields', () => {
+  const HIER = [
+    { id: 1, name: 'Trail Shoe', categories: ['Men', 'Men >>> Shoes', 'Men >>> Shoes >>> Trail'] },
+    { id: 2, name: 'Road Shoe', categories: ['Men', 'Men >>> Shoes', 'Men >>> Shoes >>> Road'] },
+    { id: 3, name: 'Dress', categories: ['Women', 'Women >>> Dresses'] },
+  ];
+
+  function hierReq(overrides: Record<string, unknown> = {}) {
+    return {
+      ...buildRequest(defaultUiState(), { text: new Set(['categories']), numeric: new Set() }, { collection: 'c' }),
+      ...overrides,
+    };
+  }
+
+  it('facet counts include every element of an array field', async () => {
+    const client = createMockClient(HIER);
+    const res = await client.search(hierReq());
+    expect(res.facets.categories).toEqual({
+      Men: 2,
+      'Men >>> Shoes': 2,
+      'Men >>> Shoes >>> Trail': 1,
+      'Men >>> Shoes >>> Road': 1,
+      Women: 1,
+      'Women >>> Dresses': 1,
+    });
+  });
+
+  it('filters match when ANY array element equals the filter value (ancestor-path filtering)', async () => {
+    const client = createMockClient(HIER);
+    const res = await client.search(hierReq({ facetFilters: { categories: ['Men >>> Shoes'] } }));
+    expect(res.totalItems).toBe(2);
+    const deeper = await client.search(hierReq({ facetFilters: { categories: ['Men >>> Shoes >>> Trail'] } }));
+    expect(deeper.items.map((i) => i.id)).toEqual([1]);
+  });
+
+  it('array facet counts stay disjunctive under their own filter', async () => {
+    const client = createMockClient(HIER);
+    const res = await client.search(hierReq({ facetFilters: { categories: ['Men'] } }));
+    // own-filter excluded from its own counts: Women still visible
+    expect(res.facets.categories?.Women).toBe(1);
+    expect(res.totalItems).toBe(2);
+  });
+});
+
 describe('mockClient — multi-collection record datasets', () => {
   const COLLECTIONS = {
     PRODUCTS: DATA,

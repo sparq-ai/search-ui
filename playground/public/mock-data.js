@@ -11,12 +11,16 @@
     for (var m = 0; m < models.length; m++) {
       var category = categories[(b + m) % categories.length];
       var swatchColors = ['Red', 'Blue', 'Black', 'Storm', 'Multi', 'Clear'];
+      var gender = ['Men', 'Women', 'Kids'][id % 3];
+      // Hierarchical taxonomy: each item carries its full ancestor chain.
+      var taxonomy = [gender, gender + ' >>> ' + category, gender + ' >>> ' + category + ' >>> ' + brands[b]];
       data.push({
+        taxonomy: taxonomy,
         id: id,
         name: brands[b] + ' ' + models[m] + ' ' + (100 + ((b * 7 + m * 13) % 900)),
         brand: brands[b],
         category: category,
-        gender: ['Men', 'Women', 'Kids'][id % 3],
+        gender: gender,
         color: swatchColors[(b * 3 + m) % swatchColors.length],
         availability: id % 5 === 0 ? 'out of stock' : 'in stock',
         price: 60 + ((b * 31 + m * 17) % 140),

@@ -9,6 +9,7 @@ import SearchBox from './widgets/SearchBox.ce.vue';
 import Items from './widgets/Items.ce.vue';
 import ItemsInfinite from './widgets/ItemsInfinite.ce.vue';
 import Filters from './widgets/Filters.ce.vue';
+import Menu from './widgets/Menu.ce.vue';
 import Sort from './widgets/Sort.ce.vue';
 import Pagination from './widgets/Pagination.ce.vue';
 import Range from './widgets/Range.ce.vue';
@@ -42,6 +43,7 @@ export function register(): void {
   customElements.define('sparq-items', toElement(Items, [ITEMS_SHARED_CSS]));
   customElements.define('sparq-items-infinite', toElement(ItemsInfinite, [ITEMS_SHARED_CSS]));
   customElements.define('sparq-filters', toElement(Filters));
+  customElements.define('sparq-menu', toElement(Menu));
   customElements.define('sparq-sort', toElement(Sort));
   customElements.define('sparq-pagination', toElement(Pagination));
   customElements.define('sparq-range', toElement(Range));

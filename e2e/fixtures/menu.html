@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>e2e hierarchical menu</title>
+  <script>
+    // Hierarchical data convention: each item carries its full ancestor chain.
+    (function () {
+      function cats() { return Array.prototype.slice.call(arguments); }
+      var data = [
+        // Men >>> Shoes >>> Trail (3)
+        { id: 1, name: 'Peak Trail', price: 120, categories: cats('Men', 'Men >>> Shoes', 'Men >>> Shoes >>> Trail') },
+        { id: 2, name: 'Ridge Trail', price: 130, categories: cats('Men', 'Men >>> Shoes', 'Men >>> Shoes >>> Trail') },
+        { id: 3, name: 'Rock Trail', price: 140, categories: cats('Men', 'Men >>> Shoes', 'Men >>> Shoes >>> Trail') },
+        // Men >>> Shoes >>> Road (2)
+        { id: 4, name: 'Speed Road', price: 110, categories: cats('Men', 'Men >>> Shoes', 'Men >>> Shoes >>> Road') },
+        { id: 5, name: 'Marathon Road', price: 150, categories: cats('Men', 'Men >>> Shoes', 'Men >>> Shoes >>> Road') },
+        // Men >>> Jackets (2)
+        { id: 6, name: 'Storm Jacket', price: 200, categories: cats('Men', 'Men >>> Jackets') },
+        { id: 7, name: 'Wind Jacket', price: 180, categories: cats('Men', 'Men >>> Jackets') },
+        // Women >>> Dresses (2)
+        { id: 8, name: 'Summer Dress', price: 90, categories: cats('Women', 'Women >>> Dresses') },
+        { id: 9, name: 'Evening Dress', price: 160, categories: cats('Women', 'Women >>> Dresses') },
+        // Women >>> Shoes (1)
+        { id: 10, name: 'City Sneaker', price: 100, categories: cats('Women', 'Women >>> Shoes') },
+      ];
+      window.__SPARQ_MOCK__ = { data: data };
+    })();
+  </script>
+  <script src="/packages/components/dist/sparq.js" defer></script>
+</head>
+<body>
+  <sparq-search collection="products" api-host="mock:" routing items-per-page="20">
+    <sparq-searchbox placeholder="Search…"></sparq-searchbox>
+    <sparq-refinements clear-label="Clear all"></sparq-refinements>
+    <sparq-menu attribute="categories" header="Categories"></sparq-menu>
+    <sparq-stats></sparq-stats>
+    <sparq-items>
+      <template><article class="result-card">{{name}}</article></template>
+    </sparq-items>
+  </sparq-search>
+</body>
+</html>

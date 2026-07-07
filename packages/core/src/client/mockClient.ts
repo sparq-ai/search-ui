@@ -26,7 +26,9 @@ function matchesFacetFilters(
   for (const [attr, values] of Object.entries(filters)) {
     if (attr === except || values.length === 0) continue;
     const v = item[attr];
-    if (!values.includes(String(v))) return false;
+    // Multi-value fields (tags, hierarchical category paths) match on ANY element.
+    const itemValues = Array.isArray(v) ? v.map(String) : [String(v)];
+    if (!values.some((wanted) => itemValues.includes(wanted))) return false;
   }
   return true;
 }
@@ -101,7 +103,10 @@ export function createMockClient(
         for (const item of pool) {
           const v = item[attr];
           if (v === undefined || v === null) continue;
-          counts[String(v)] = (counts[String(v)] ?? 0) + 1;
+          // Multi-value fields contribute one count per element.
+          for (const value of Array.isArray(v) ? v : [v]) {
+            counts[String(value)] = (counts[String(value)] ?? 0) + 1;
+          }
         }
         facets[attr] = counts;
       }
