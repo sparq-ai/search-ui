@@ -6,6 +6,7 @@ Build a complete search frontend for [Sparq.ai](https://sparq.ai) on any HTML pa
 
 - **[Getting started](./getting-started.md)** — your first search page in 5 minutes
 - **[Theming](./theming.md)** — design tokens, `::part()` styling, and the CSS isolation guarantees
+- **[Styling reference](./styling/README.md)** — per-component anatomy (every part + token), light-DOM hooks, and copy-paste recipes
 - **[JavaScript API](./javascript-api.md)** — hooks, the controller, events, custom clients
 - **[SEO & server-rendered takeover](./seo.md)** — `<sparq-ssr>`, the URL contract, crawlable pages
 - **[Performance](./performance.md)** — Core Web Vitals checklist (CLS, LCP, INP)

@@ -30,6 +30,9 @@ jobs:
       - name: Terminology check (ARCHITECTURE §19)
         run: pnpm lint:terminology
 
+      - name: Styling docs drift check
+        run: pnpm lint:styling-docs
+
       - name: Typecheck
         run: pnpm typecheck
 
