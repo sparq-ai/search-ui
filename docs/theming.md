@@ -1,5 +1,7 @@
 # Theming
 
+> Looking for the complete catalog — every part on every component, per-component token consumption, light-DOM hooks, and worked recipes? See the **[Styling reference](./styling/README.md)** (CI-verified against source).
+
 Every component renders inside Shadow DOM with a hard isolation boundary — styling flows through exactly **two doors**, both intentional:
 
 1. **Design tokens** (`--sparq-*` custom properties) — set them on any ancestor; they pierce inward.

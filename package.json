@@ -12,7 +12,8 @@
     "test": "pnpm --filter @sparq/search-core test && pnpm --filter @sparq/search-ui test",
     "size": "pnpm --filter @sparq/search-ui size",
     "e2e": "pnpm build && playwright test -c e2e/playwright.config.ts",
-    "lint:terminology": "node scripts/check-terminology.mjs"
+    "lint:terminology": "node scripts/check-terminology.mjs",
+    "lint:styling-docs": "node scripts/check-styling-docs.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.53.0",
