@@ -2,14 +2,20 @@
 
 ```html
 <sparq-pagination padding="2" show-first-last></sparq-pagination>
+
+<!-- minimal two-button pager -->
+<sparq-pagination mode="prevnext"></sparq-pagination>
 ```
 
 ## Attributes
 
 | Attribute | Default | Description |
 |---|---|---|
-| `padding` | `2` | Number of page buttons on each side of the current page |
-| `show-first-last` | off | Adds « first / last » buttons |
+| `mode` | `numbered` | `numbered` for the full page-number list, or `prevnext` for a minimal Prev / Next pager with a "Page X of Y" status |
+| `padding` | `2` | Number of page buttons on each side of the current page (`numbered` mode) |
+| `show-first-last` | off | Adds « first / last » buttons (`numbered` mode) |
+| `prev-label` | `‹ Prev` | Button text for the previous-page button (`prevnext` mode) |
+| `next-label` | `Next ›` | Button text for the next-page button (`prevnext` mode) |
 | `for` | — | Provider `id` |
 
 ## Behavior notes
@@ -25,7 +31,7 @@ Page changes surface on the provider as `sparq:page-change` — `{ page }` (0-ba
 
 ## Shadow parts
 
-`root`, `nav`, `list`, `item`, `link` (current page also carries `link-active`), `prev`, `next`, `first`, `last`
+`root`, `nav`, `list`, `item`, `link` (current page also carries `link-active`), `prev`, `next`, `first`, `last`, `status` (the "Page X of Y" text in `prevnext` mode)
 
 ```css
 sparq-pagination::part(link-active) { background: #111; color: #fff; }

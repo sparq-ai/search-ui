@@ -66,7 +66,7 @@ document.querySelector('sparq-filters[attribute="system_vendor"]').transformValu
 
 ## Shadow parts
 
-`root`, `header`, `search-input`, `list`, `item`, `label`, `checkbox`, `count`, `show-more-button`; pill mode adds `pill` / `pill-selected`; swatch modes add `swatch` / `swatch-selected`.
+`root`, `header`, `search-input`, `list`, `item`, `label`, `checkbox`, `count`, `show-more-button`; selected rows also carry `item-selected` / `label-selected`; pill mode adds `pill` / `pill-selected`; swatch modes add `swatch` / `swatch-selected`.
 
 ```css
 sparq-filters::part(count) { font-variant-numeric: tabular-nums; }

@@ -10,7 +10,8 @@
     body { font-family: system-ui, sans-serif; max-width: 960px; margin: 40px auto; padding: 0 20px; }
     .layout { display: grid; grid-template-columns: 240px 1fr; gap: 32px; margin-top: 16px; }
     aside > * { display: block; margin-bottom: 24px; }
-    .toolbar { display: flex; justify-content: space-between; align-items: center; margin: 12px 0; }
+    .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin: 12px 0; }
+    .toolbar .controls { display: flex; align-items: center; gap: 16px; }
     .card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; margin-bottom: 8px; }
     .card h3 { margin: 0 0 4px; font-size: 1rem; }
     .card .meta { color: #6b7280; font-size: 0.85rem; }
@@ -43,7 +44,10 @@
       <main>
         <div class="toolbar">
           <sparq-stats></sparq-stats>
-          <sparq-sort label="Sort by" options="relevance|Relevance, price:asc|Price ↑, price:desc|Price ↓, name:asc|Name A–Z"></sparq-sort>
+          <div class="controls">
+            <sparq-perpage label="Per page" options="10,20,50"></sparq-perpage>
+            <sparq-sort label="Sort by" options="relevance|Relevance, price:asc|Price ↑, price:desc|Price ↓, name:asc|Name A–Z"></sparq-sort>
+          </div>
         </div>
         <sparq-items empty-text="No shoes match your filters.">
           <template>
@@ -53,7 +57,7 @@
             </article>
           </template>
         </sparq-items>
-        <sparq-pagination padding="2"></sparq-pagination>
+        <sparq-pagination mode="prevnext"></sparq-pagination>
       </main>
     </div>
   </sparq-search>

@@ -27,7 +27,8 @@ Build a complete search frontend for [Sparq.ai](https://sparq.ai) on any HTML pa
 | [`<sparq-rating>`](./components/sparq-rating.md) | "N stars & up" rating facet |
 | [`<sparq-toggle>`](./components/sparq-toggle.md) | Single-value on/off switch (e.g. in-stock only) |
 | [`<sparq-sort>`](./components/sparq-sort.md) | Sort-order select |
-| [`<sparq-pagination>`](./components/sparq-pagination.md) | Page navigation |
+| [`<sparq-pagination>`](./components/sparq-pagination.md) | Page navigation (numbered or prev/next) |
+| [`<sparq-perpage>`](./components/sparq-perpage.md) | Results-per-page selector |
 | [`<sparq-range>`](./components/sparq-range.md) | Numeric min/max filter (e.g. price) |
 | [`<sparq-refinements>`](./components/sparq-refinements.md) | Active-filter chips + clear all |
 | [`<sparq-stats>`](./components/sparq-stats.md) | Result count / timing line |

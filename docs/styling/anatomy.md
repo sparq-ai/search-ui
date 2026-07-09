@@ -69,7 +69,9 @@ Checkbox / single / color-list rows:
 | Part | Element | Appears |
 |---|---|---|
 | `item` | `li` | per value |
+| `item-selected` | state variant on `item` | selected rows |
 | `label` | `label` wrapping the row | per value |
+| `label-selected` | state variant on `label` | selected rows |
 | `checkbox` | the `input` (checkbox or radio) | per value |
 | `swatch` | color dot `span` | `color-list` mode |
 
@@ -128,13 +130,24 @@ Tokens: `--sparq-color-bg`, `--sparq-color-border`, `--sparq-color-text-muted`, 
 | `link` | every page/arrow `button` | per control |
 | `link-active` | state variant | current page |
 | `first` / `prev` / `next` / `last` | additional tokens on the arrow buttons | (`first`/`last` need `show-first-last`) |
+| `status` | "Page X of Y" `span` | `mode="prevnext"` |
 
-Tokens: `--sparq-color-bg`, `--sparq-color-border`, `--sparq-color-primary`, `--sparq-color-primary-contrast`, `--sparq-radius-sm`, `--sparq-spacing`
+Tokens: `--sparq-color-bg`, `--sparq-color-border`, `--sparq-color-primary`, `--sparq-color-primary-contrast`, `--sparq-color-text-muted`, `--sparq-radius-sm`, `--sparq-spacing`
 
 ```css
 sparq-pagination::part(link) { border-radius: 999px; }
 sparq-pagination::part(link-active) { box-shadow: 0 0 0 3px rgba(37, 99, 235, .3); }
 ```
+
+## `<sparq-perpage>`
+
+| Part | Element | Appears |
+|---|---|---|
+| `root` | wrapper `div` | always |
+| `label` | label `span` | `label` attribute set |
+| `select` | the `select` | always |
+
+Tokens: `--sparq-color-bg`, `--sparq-color-border`, `--sparq-color-text-muted`, `--sparq-radius`, `--sparq-spacing`
 
 ## `<sparq-range>`
 

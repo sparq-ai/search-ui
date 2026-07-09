@@ -164,8 +164,8 @@ function swatchKind(value: string): string {
 
     <!-- checkbox / single / color-list: rows -->
     <ul v-else class="list" part="list" :role="mode === 'single' ? 'radiogroup' : undefined" :aria-label="mode === 'single' ? (header ?? attribute ?? undefined) : undefined">
-      <li v-for="v in visible" :key="v.value" class="item" part="item">
-        <label class="label" part="label">
+      <li v-for="v in visible" :key="v.value" class="item" :part="v.selected ? 'item item-selected' : 'item'">
+        <label class="label" :part="v.selected ? 'label label-selected' : 'label'">
           <input
             class="input"
             part="checkbox"

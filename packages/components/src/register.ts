@@ -12,6 +12,7 @@ import Filters from './widgets/Filters.ce.vue';
 import Menu from './widgets/Menu.ce.vue';
 import Sort from './widgets/Sort.ce.vue';
 import Pagination from './widgets/Pagination.ce.vue';
+import PerPage from './widgets/PerPage.ce.vue';
 import Range from './widgets/Range.ce.vue';
 import Rating from './widgets/Rating.ce.vue';
 import Refinements from './widgets/Refinements.ce.vue';
@@ -46,6 +47,7 @@ export function register(): void {
   customElements.define('sparq-menu', toElement(Menu));
   customElements.define('sparq-sort', toElement(Sort));
   customElements.define('sparq-pagination', toElement(Pagination));
+  customElements.define('sparq-perpage', toElement(PerPage));
   customElements.define('sparq-range', toElement(Range));
   customElements.define('sparq-rating', toElement(Rating));
   customElements.define('sparq-refinements', toElement(Refinements));

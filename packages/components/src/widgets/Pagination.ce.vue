@@ -7,6 +7,9 @@ const { controller, host } = useController({ role: 'pagination' });
 
 const padding = parseNumAttr(host.getAttribute('padding'), 2);
 const showFirstLast = parseBoolAttr(host.getAttribute('show-first-last'));
+const prevNext = host.getAttribute('mode') === 'prevnext';
+const prevLabel = host.getAttribute('prev-label') ?? '‹ Prev';
+const nextLabel = host.getAttribute('next-label') ?? 'Next ›';
 
 const page = computed(() => controller.value?.state.results?.page ?? 0);
 const totalPages = computed(() => controller.value?.state.results?.totalPages ?? 1);
@@ -40,6 +43,11 @@ function go(p: number): void {
     <ul v-if="!resultsKnown" class="list" aria-hidden="true">
       <li class="item"><button class="link" type="button" disabled>1</button></li>
     </ul>
+    <div v-else-if="prevNext" class="prevnext" part="list">
+      <button class="link" part="link prev" type="button" :disabled="page === 0" aria-label="Previous page" @click="go(page - 1)">{{ prevLabel }}</button>
+      <span class="status" part="status">Page {{ page + 1 }} of {{ totalPages }}</span>
+      <button class="link" part="link next" type="button" :disabled="page >= totalPages - 1" aria-label="Next page" @click="go(page + 1)">{{ nextLabel }}</button>
+    </div>
     <ul v-else class="list" part="list">
       <li v-if="showFirstLast" class="item" part="item">
         <button class="link" part="link first" type="button" :disabled="page === 0" aria-label="First page" @click="go(0)">«</button>
@@ -78,6 +86,16 @@ function go(p: number): void {
   gap: 4px;
   list-style: none;
   align-items: center;
+}
+.prevnext {
+  display: flex;
+  gap: calc(var(--sparq-spacing, 8px));
+  align-items: center;
+}
+.status {
+  color: var(--sparq-color-text-muted, #6b7280);
+  font-size: 0.9em;
+  font-variant-numeric: tabular-nums;
 }
 .link {
   min-width: 2.2em;

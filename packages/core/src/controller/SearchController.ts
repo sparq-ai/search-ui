@@ -29,6 +29,7 @@ export type WidgetRole =
   | 'filters'
   | 'sort'
   | 'pagination'
+  | 'perpage'
   | 'range'
   | 'refinements'
   | 'stats'
