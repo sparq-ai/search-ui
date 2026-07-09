@@ -97,13 +97,18 @@
 
     // Sidebar facets. type: 'filters' | 'range' | 'toggle'.
     // IMPORTANT: only attributes CONFIGURED AS FACETS on the collection may be
-    // used here — requesting a non-facet attribute breaks the whole search.
-    // Currently enabled on "Products": brand, availability (+ numeric price
-    // filtering works via static bounds even though the server sends no stats).
-    // To add Category / Caliber / etc., configure them as facets in dash.sparq.ai.
+    // used here — requesting a NON-configured attribute breaks the whole search.
+    // Configured on "Products": brand, availability, categoryIds, Caliber,
+    // BarrelLength, FirearmFit, feature_5. Empty facets auto-hide (see
+    // data-facet-attr), so Caliber/BarrelLength/FirearmFit will appear the moment
+    // their data is populated on the records. (categoryIds is faceted as numeric
+    // IDs — facet `categories` instead for readable names, then add it here.)
     facets: [
-      { type: 'filters', attribute: 'brand', title: 'Brand', searchable: true, limit: 8, showMore: true, links: true },
+      { type: 'filters', attribute: 'Caliber', title: 'Caliber / Gauge', searchable: true, limit: 5, showMore: true },
+      { type: 'filters', attribute: 'BarrelLength', title: 'Barrel Length', mode: 'single', links: true },
       { type: 'range', attribute: 'price', title: 'Price', prefix: '$', min: 0, max: 18000, step: 10 },
+      { type: 'filters', attribute: 'brand', title: 'Brand', searchable: true, limit: 6, showMore: true, links: true },
+      { type: 'filters', attribute: 'FirearmFit', title: 'Firearm Fit', collapsible: true, links: true },
       { type: 'toggle', attribute: 'availability', value: 'In stock', label: 'Show In Stock Items Only' }
     ],
 
@@ -325,13 +330,16 @@
     }
 
     var wrapClass = 'sqw-facet' + (f.links ? ' sqw-facet--links' : '');
+    // Tag filter groups with their attribute so empty ones can auto-hide (a facet
+    // that's configured server-side but has no values yet renders an empty block).
+    var hideAttr = f.type === 'filters' ? ' data-facet-attr="' + esc(f.attribute) + '"' : '';
     if (f.collapsible) {
       open = f.open === false ? '' : ''; // collapsed by default, matching the design
-      return '<details class="' + wrapClass + ' sqw-facet--collapsible"' + open + '>' +
+      return '<details class="' + wrapClass + ' sqw-facet--collapsible"' + hideAttr + open + '>' +
         '<summary class="sqw-facet-title">' + esc(f.title) + '</summary>' + inner + '</details>';
     }
     titleTag = '<div class="sqw-facet-title">' + esc(f.title) + '</div>';
-    return '<div class="' + wrapClass + '">' + titleTag + inner + '</div>';
+    return '<div class="' + wrapClass + '"' + hideAttr + '>' + titleTag + inner + '</div>';
   }
 
   function breadcrumbMarkup(items) {
@@ -451,6 +459,30 @@
       /* storage disabled — favorites are session-only */
     }
   }
+  // Hide facet groups that have no values (configured server-side but no data
+  // yet), so empty section headers never show. Runs on every search result.
+  function updateFacetVisibility(root, state) {
+    var results = state && state.results;
+    var groups = root.querySelectorAll('[data-facet-attr]');
+    for (var i = 0; i < groups.length; i++) {
+      var w = groups[i];
+      if (!results) { w.style.display = ''; continue; } // pre-results: leave visible
+      var vals = results.facets && results.facets[w.getAttribute('data-facet-attr')];
+      w.style.display = (vals && vals.length) ? '' : 'none';
+    }
+  }
+  function wireFacetVisibility(root) {
+    var provider = root.querySelector('sparq-search');
+    var tries = 0;
+    (function attach() {
+      if (provider && provider.controller && typeof provider.controller.subscribe === 'function') {
+        provider.controller.subscribe(function (state) { updateFacetVisibility(root, state); });
+        return;
+      }
+      if (tries++ < 60) setTimeout(attach, 50);
+    })();
+  }
+
   function wireFavorites(root) {
     root.addEventListener('click', function (e) {
       var btn = e.target && e.target.closest ? e.target.closest('.sqw-fav') : null;
@@ -536,6 +568,9 @@
       el.innerHTML = widgetMarkup(cfg);
       // 4) Delegated favorites (items render in the light DOM under sparq-items).
       wireFavorites(el);
+      // 5) Auto-hide facet groups that have no values (e.g. Caliber before its
+      //    data is populated), so empty section headers never appear.
+      wireFacetVisibility(el);
     }).catch(function (err) {
       console.error('[sparq-widget]', err);
       el.innerHTML = '<p style="color:#b91c1c">Search failed to load. Check the Sparq library URL / network.</p>';
