@@ -106,6 +106,9 @@
     facets: [
       { type: 'filters', attribute: 'Caliber', title: 'Caliber / Gauge', searchable: true, limit: 5, showMore: true },
       { type: 'filters', attribute: 'BarrelLength', title: 'Barrel Length', mode: 'single', links: true },
+      // STOPGAP: categoryIds shows numeric IDs. Facet `categories` for names, then
+      // switch attribute to 'categories' below.
+      { type: 'filters', attribute: 'categoryIds', title: 'Category', searchable: true, limit: 8, showMore: true, links: true },
       { type: 'range', attribute: 'price', title: 'Price', prefix: '$', min: 0, max: 18000, step: 10 },
       { type: 'filters', attribute: 'brand', title: 'Brand', searchable: true, limit: 6, showMore: true, links: true },
       { type: 'filters', attribute: 'FirearmFit', title: 'Firearm Fit', collapsible: true, links: true },
