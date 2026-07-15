@@ -1,0 +1,97 @@
+/* ============================================================================
+   sparq-overrides.css — theme the Sparq storefront widget by hand.
+
+   HOW IT WORKS
+   - The widget injects its own base styles first in <head>, so THIS file
+     (loaded after) wins with plain #sparq-widget selectors. No !important.
+   - Three kinds of hooks:
+       1) --sparq-* tokens ....... colors/spacing INSIDE the components
+                                   (checkboxes, slider, pagination, sort…)
+       2) ::part(...) ............ specific parts of a component's shadow DOM
+       3) .sqw-* classes ......... the result CARD + page layout (light DOM)
+
+   USE IT
+     PrestaShop:  upload to themes/<theme>/assets/css/ and enqueue AFTER the
+                  widget script. Or just <link> it after the widget on any page.
+     Locally:     open preview.html (see the comment at the bottom).
+
+   EDIT the variables in the first block — everything else reads from them.
+   ============================================================================ */
+
+#sparq-widget {
+  /* ---- YOUR BRAND (change these) ------------------------------------------ */
+  --sparq-color-primary: #16367d;   /* blue: active page, slider, checkboxes, links */
+  --sparq-color-text:     #1f2937;  /* body text */
+  --sparq-color-border:   #d8dbe0;  /* input/card borders */
+  --sparq-color-bg:       #ffffff;  /* input/button backgrounds */
+  --sparq-color-focus:    #16367d;  /* focus outline */
+  --sparq-radius:         4px;      /* corner rounding */
+  --sparq-spacing:        8px;      /* base spacing unit */
+  --sparq-font-family:    system-ui, Arial, Helvetica, sans-serif;
+
+  /* Card accents (used by the .sqw-* rules below) */
+  --sqw-accent:      #cf1f2b;       /* red: card title bar + sale badge */
+  --sqw-accent-dark: #b41822;
+  --sqw-foot-bg:     #111111;       /* black: price footer */
+  --sqw-card-radius: 4px;
+}
+
+/* ---- Page chrome --------------------------------------------------------- */
+#sparq-widget .sqw-title      { font-weight: 800; letter-spacing: .04em; }
+#sparq-widget .sqw-breadcrumb a { color: #374151; }
+#sparq-widget .sqw-layout     { gap: 32px; }          /* sidebar ↔ results gap */
+
+/* ---- Facet sidebar ------------------------------------------------------- */
+#sparq-widget .sqw-facet-title { font-size: .8rem; letter-spacing: .06em; color: #111827; }
+/* Bracketed counts like [178] */
+#sparq-widget sparq-filters::part(count) { color: #6b7280; font-variant-numeric: tabular-nums; }
+/* Selected facet row highlight */
+#sparq-widget sparq-filters::part(label-selected) { color: var(--sparq-color-primary); font-weight: 600; }
+/* Sort dropdown */
+#sparq-widget sparq-sort::part(select) { border-color: var(--sparq-color-border); }
+
+/* ---- Pagination ---------------------------------------------------------- */
+#sparq-widget sparq-pagination::part(link)        { min-width: 40px; height: 40px; }
+#sparq-widget sparq-pagination::part(link-active) {
+  background: var(--sparq-color-primary);
+  border-color: var(--sparq-color-primary);
+  color: #fff;
+}
+
+/* ---- Result card --------------------------------------------------------- */
+#sparq-widget .sqw-card {
+  border: 1px solid #e5e7eb;
+  border-radius: var(--sqw-card-radius);
+}
+/* Red title bar */
+#sparq-widget .sqw-card-title {
+  background: linear-gradient(180deg, var(--sqw-accent), var(--sqw-accent-dark));
+  color: #fff;
+  font-size: .82rem;
+  font-weight: 600;
+}
+/* Favorite heart */
+#sparq-widget .sqw-fav               { color: var(--sqw-accent); }
+#sparq-widget .sqw-fav[data-faved="1"] { background: var(--sqw-accent); color: #fff; }
+/* Black price footer */
+#sparq-widget .sqw-card-foot   { background: var(--sqw-foot-bg); color: #fff; }
+#sparq-widget .sqw-price-main  { font-weight: 700; }
+/* Red "Sale price" badge */
+#sparq-widget .sqw-price-sale  { background: var(--sqw-accent); color: #fff; border-radius: 3px; }
+/* Product image area */
+#sparq-widget .sqw-card-img    { aspect-ratio: 4 / 3; background-color: #f3f4f6; }
+
+/* ---- Responsive: card columns (targets the component's slotted grid) ------ */
+#sparq-widget sparq-items::part(list) { gap: 18px; }
+/* Want 4 across on wide screens? uncomment:
+@media (min-width: 1300px) {
+  #sparq-widget sparq-items::part(list) { grid-template-columns: repeat(4, 1fr); }
+}
+*/
+
+/* ============================================================================
+   SEE IT LOCALLY
+   Open preview.html (in this folder) — it loads the widget in demo mode (built-in
+   sample products, no credentials) with THIS stylesheet linked. Edit values
+   above, refresh the page, watch it change.
+   ============================================================================ */

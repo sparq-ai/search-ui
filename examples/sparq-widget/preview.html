@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>sparq-widget — local preview</title>
+
+  <!-- Your editable theme. Loaded AFTER the widget so it wins. -->
+  <link rel="stylesheet" href="./sparq-overrides.css" />
+
+  <style>
+    body { margin: 0; font-family: system-ui, sans-serif; background: #fff; }
+    #sparq-widget { max-width: 1200px; margin: 24px auto; padding: 0 20px; }
+  </style>
+
+  <!--
+    DEMO MODE: no credentials needed — the widget renders built-in sample
+    products so you can style freely. (Swap to your real store by setting
+    appId/apiKey and removing demo:true.)
+  -->
+  <script>
+    window.SparqWidget = {
+      demo: true,
+      // Sparq library from CDN. (Needs internet. To go fully offline, point this
+      // at a local copy of lib/sparq.js.)
+      libUrl: 'https://cdn.jsdelivr.net/gh/sparq-ai/search-ui@ui-render/lib/sparq.js'
+    };
+  </script>
+</head>
+<body>
+  <!-- The widget auto-creates its own mount, but we provide one for placement. -->
+  <div id="sparq-widget"></div>
+
+  <!-- Local widget file (same folder). In production you'd use the CDN URL. -->
+  <script src="./sparq-widget.js" defer></script>
+
+  <!--
+    RUN IT:
+      cd examples/sparq-widget
+      python3 -m http.server 8000      (or: npx serve)
+      open http://localhost:8000/preview.html
+    Then edit sparq-overrides.css and refresh to see changes.
+  -->
+</body>
+</html>

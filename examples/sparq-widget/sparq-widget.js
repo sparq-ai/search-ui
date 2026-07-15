@@ -194,22 +194,27 @@
       return 'data:image/svg+xml,' + encodeURIComponent(svg);
     }
     var colors = ['#334155', '#7f1d1d', '#1e3a8a', '#166534', '#92400e', '#4c1d95'];
+    var catIds = ['600', '757', '640', '894'];
     var data = [];
     for (var i = 0; i < 28; i++) {
       var brand = brands[i % brands.length];
       var caliber = cals[i % cals.length];
-      var price = 40 + ((i * 37) % 480);
+      var base = 40 + ((i * 37) % 480);
       var onSale = i % 3 === 0;
+      // Field names mirror the real "Products" schema so the demo matches the
+      // widget's configured fields/facets (regularPrice/price, Caliber, etc.).
       data.push({
         id: i + 1,
         name: brand + ' ' + caliber + ' ' + (100 + ((i * 13) % 900)) + ' Rounds',
-        brand: brand, caliber: caliber,
-        barrelLength: barrels[i % barrels.length],
-        firearmFit: fits[i % fits.length],
-        availability: i % 5 === 0 ? 'out of stock' : 'in stock',
+        brand: brand,
+        Caliber: caliber,
+        BarrelLength: barrels[i % barrels.length],
+        FirearmFit: fits[i % fits.length],
+        categoryIds: catIds[i % catIds.length],
+        availability: i % 5 === 0 ? 'Out of stock' : 'In stock',
         inStock: i % 5 === 0 ? 'false' : 'true',
-        price: price,
-        salePrice: onSale ? Math.round(price * 0.88) : '',
+        regularPrice: base,
+        price: onSale ? Math.round(base * 0.88) : base,
         image: img(brand, colors[i % colors.length]),
         url: '#product-' + (i + 1)
       });
@@ -553,12 +558,14 @@
       cfg.routing = false; // don't rewrite the host page's URL in demo mode
     }
 
-    // 1) Inject theme once.
+    // 1) Inject theme once, as the FIRST thing in <head>, so any external
+    //    stylesheet (e.g. your sparq-overrides.css) can override it with plain
+    //    #sparq-widget selectors — no !important needed.
     if (!document.getElementById('sparq-widget-style')) {
       var style = document.createElement('style');
       style.id = 'sparq-widget-style';
       style.textContent = themeCss(cfg, mountSel);
-      document.head.appendChild(style);
+      document.head.insertBefore(style, document.head.firstChild);
     }
 
     // 2) Register display hooks BEFORE the provider upgrades (it reads global
