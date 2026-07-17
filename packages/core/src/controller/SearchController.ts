@@ -91,6 +91,7 @@ export class SearchController {
   private started = false;
   private disposed = false;
   private appendNext = false;
+  private pageFromLoadMore = false;
   private microtaskScheduled = false;
   private debounceTimer: ReturnType<typeof setTimeout> | undefined;
   private stalledTimer: ReturnType<typeof setTimeout> | undefined;
@@ -149,6 +150,7 @@ export class SearchController {
     const clamped = Math.max(0, Math.min(page, this.totalPages - 1));
     if (this.state.page === clamped) return;
     this.state.page = clamped;
+    this.pageFromLoadMore = false;
     this.emit('page-change', { page: clamped });
     this.schedule('immediate');
   }
@@ -213,7 +215,10 @@ export class SearchController {
   /** Batch state application (URL sync, host-page JS). */
   setUiState(partial: Partial<UiState>): void {
     if (partial.query !== undefined) this.state.query = partial.query;
-    if (partial.page !== undefined) this.state.page = partial.page;
+    if (partial.page !== undefined) {
+      this.state.page = partial.page;
+      this.pageFromLoadMore = false;
+    }
     if (partial.itemsPerPage !== undefined) this.state.itemsPerPage = partial.itemsPerPage;
     if (partial.sort !== undefined) this.state.sort = partial.sort;
     if (partial.facetFilters !== undefined) this.state.facetFilters = { ...partial.facetFilters };
@@ -225,7 +230,16 @@ export class SearchController {
     if (this.isLastPage || this.state.status === 'loading' || this.state.status === 'stalled') return;
     this.state.page += 1;
     this.appendNext = true;
+    this.pageFromLoadMore = true;
     await this.run();
+  }
+
+  /**
+   * True when the page was reached by loadMore() rather than an explicit
+   * navigation. Routing omits it: "scrolled through 8 pages" is not "?page=8".
+   */
+  get isAccumulatedPage(): boolean {
+    return this.pageFromLoadMore;
   }
 
   refresh(): void {
