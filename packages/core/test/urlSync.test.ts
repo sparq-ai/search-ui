@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { describe, expect, it } from 'vitest';
 import { SearchController, attachUrlSync, parseUrlState, serializeUrlState, defaultUiState } from '../src';
-import { recordingClient, sleep, tick } from './helpers';
+import { recordingClient, response, sleep, tick } from './helpers';
 
 describe('URL state serialization', () => {
   it('round-trips the full state', () => {
@@ -57,6 +57,68 @@ describe('attachUrlSync', () => {
     await sleep(20);
     expect(window.location.search).toContain('f.category=Road');
     expect(window.location.search).toContain('q=boots');
+    detach();
+  });
+
+  it('keeps loadMore() out of the URL and out of history', async () => {
+    // Serializing loadMore() pages pushed a history entry per scroll, and
+    // re-opening ?page=3 restored one mid-list page with the rest unreachable.
+    window.history.replaceState(null, '', '/search?q=boots');
+    const { client } = recordingClient((_req, i) =>
+      response({ items: [{ objectID: String(i) }], totalItems: 100 }),
+    );
+    const c = new SearchController(client, { collection: 'products', itemsPerPage: 10 });
+    const detach = attachUrlSync(c);
+    c.start();
+    await tick();
+
+    const historyBefore = window.history.length;
+    await c.loadMore();
+    await sleep(20);
+    await c.loadMore();
+    await sleep(20);
+
+    expect(c.state.page).toBe(2);
+    expect(window.location.search).not.toContain('page=');
+    expect(window.location.search).toContain('q=boots');
+    expect(window.history.length).toBe(historyBefore);
+    detach();
+  });
+
+  it('still routes an explicit page navigation', async () => {
+    window.history.replaceState(null, '', '/search?q=boots');
+    const { client } = recordingClient((_req, i) =>
+      response({ items: [{ objectID: String(i) }], totalItems: 100 }),
+    );
+    const c = new SearchController(client, { collection: 'products', itemsPerPage: 10 });
+    const detach = attachUrlSync(c);
+    c.start();
+    await tick();
+
+    c.setPage(3);
+    await sleep(20);
+
+    expect(window.location.search).toContain('page=4');
+    detach();
+  });
+
+  it('routes the page again once an explicit navigation follows a loadMore', async () => {
+    window.history.replaceState(null, '', '/search?q=boots');
+    const { client } = recordingClient((_req, i) =>
+      response({ items: [{ objectID: String(i) }], totalItems: 100 }),
+    );
+    const c = new SearchController(client, { collection: 'products', itemsPerPage: 10 });
+    const detach = attachUrlSync(c);
+    c.start();
+    await tick();
+
+    await c.loadMore();
+    await sleep(20);
+    expect(window.location.search).not.toContain('page=');
+
+    c.setPage(5);
+    await sleep(20);
+    expect(window.location.search).toContain('page=6');
     detach();
   });
 

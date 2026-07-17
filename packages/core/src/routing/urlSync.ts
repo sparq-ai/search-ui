@@ -144,7 +144,8 @@ function snapshot(controller: SearchController): UiState {
   const s = controller.state;
   return {
     query: s.query,
-    page: s.page,
+    // loadMore() pages are an accumulation, not a destination — see isAccumulatedPage.
+    page: controller.isAccumulatedPage ? 0 : s.page,
     itemsPerPage: s.itemsPerPage,
     sort: s.sort,
     facetFilters: { ...s.facetFilters },
