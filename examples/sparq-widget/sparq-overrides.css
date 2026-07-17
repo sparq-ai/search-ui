@@ -17,12 +17,16 @@
    ============================================================================ */
 
 #sparq-widget {
-  /* ---- Brand (edit these) -------------------------------------------------- */
-  --sparq-color-primary: #16367d;   /* blue: FAB, active page, slider, links */
-  --sparq-color-accent:  #cf1f2b;   /* red: card title bar, sale badge */
-  --sqw-fab-bottom: 84px;           /* FAB height above viewport bottom — raised
-                                       so it clears a fixed mobile bottom nav;
-                                       set to 18px if your theme has none */
+  /* FAB height above the viewport bottom — raised so it clears a fixed mobile
+     bottom nav; set to 18px if your theme has none. */
+  --sqw-fab-bottom: 84px;
+
+  /* ---- Brand ---------------------------------------------------------------
+     The module's BO Appearance panel is the source of truth for --sparq-*
+     tokens. Uncomment ONLY to hard-override it from CSS:
+  --sparq-color-primary: #16367d;
+  --sparq-color-accent:  #cf1f2b;
+  --------------------------------------------------------------------------- */
 }
 
 /* ---- Toolbar: "SHOWING 4 OUT OF 28" style ---------------------------------- */
