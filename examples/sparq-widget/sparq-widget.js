@@ -254,7 +254,22 @@
       rootSel + ' .sqw-title { font-size: 2rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; margin: 0 0 10px; }',
       rootSel + ' .sqw-desc { color: #4b5563; max-width: 70ch; margin: 0 0 20px; line-height: 1.5; }',
       rootSel + ' .sqw-layout { display: grid; grid-template-columns: 250px 1fr; gap: 32px; align-items: start; }',
-      '@media (max-width: 760px) { ' + rootSel + ' .sqw-layout { grid-template-columns: 1fr; } }',
+      // Mobile: sidebar becomes a slide-in drawer opened by a floating filter
+      // button (FAB). Desktop is untouched. All of this is overridable from
+      // sparq-overrides.css (this sheet is first in <head>).
+      rootSel + ' .sqw-filter-fab { display: none; position: fixed; right: 18px; bottom: var(--sqw-fab-bottom, 18px); z-index: 9992; width: 56px; height: 56px; border-radius: 50%; border: 0; background: ' + t.primary + '; color: #fff; box-shadow: 0 4px 14px rgba(0,0,0,.3); cursor: pointer; align-items: center; justify-content: center; }',
+      rootSel + ' .sqw-drawer-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 9990; }',
+      '@media (max-width: 820px) {',
+      '  ' + rootSel + ' .sqw-layout { grid-template-columns: 1fr; }',
+      '  ' + rootSel + ' .sqw-filter-fab { display: flex; }',
+      // Drawer styles apply only when the FAB exists (:has) — without it the
+      // sidebar falls back to stacking above the results, never unreachable.
+      '  ' + rootSel + ':has(.sqw-filter-fab) .sqw-sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: min(320px, 85vw); background: #fff; z-index: 9991; padding: 16px 18px; overflow-y: auto; transform: translateX(-105%); transition: transform .25s ease; box-shadow: 2px 0 18px rgba(0,0,0,.18); }',
+      '  ' + rootSel + ':has(.sqw-filter-fab) .sqw-sidebar::before { content: "FILTER BY"; display: block; font-weight: 700; letter-spacing: .06em; font-size: .8rem; color: #111827; margin-bottom: 8px; }',
+      '  ' + rootSel + '.sqw-drawer-open .sqw-sidebar { transform: translateX(0); }',
+      '  ' + rootSel + '.sqw-drawer-open .sqw-drawer-overlay { display: block; }',
+      '}',
+      'body:has(' + rootSel + '.sqw-drawer-open) { overflow: hidden; }',
 
       // Sidebar facets.
       rootSel + ' .sqw-facet { padding: 14px 0; border-bottom: 1px solid #e5e7eb; }',
@@ -491,6 +506,26 @@
     })();
   }
 
+  // Mobile filter drawer: a floating filter button (FAB) toggles the sidebar
+  // in/out. Shown only ≤820px (CSS); a click outside or Escape closes it.
+  function wireFilterFab(root) {
+    if (root.querySelector('.sqw-filter-fab')) return;
+    var overlay = document.createElement('div');
+    overlay.className = 'sqw-drawer-overlay';
+    var fab = document.createElement('button');
+    fab.type = 'button';
+    fab.className = 'sqw-filter-fab';
+    fab.setAttribute('aria-label', 'Show filters');
+    fab.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="22 3 2 3 10 12.5 10 19 14 21 14 12.5 22 3"></polygon></svg>';
+    fab.addEventListener('click', function () { root.classList.toggle('sqw-drawer-open'); });
+    overlay.addEventListener('click', function () { root.classList.remove('sqw-drawer-open'); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') root.classList.remove('sqw-drawer-open');
+    });
+    root.appendChild(overlay);
+    root.appendChild(fab);
+  }
+
   function wireFavorites(root) {
     root.addEventListener('click', function (e) {
       var btn = e.target && e.target.closest ? e.target.closest('.sqw-fav') : null;
@@ -581,6 +616,8 @@
       // 5) Auto-hide facet groups that have no values (e.g. Caliber before its
       //    data is populated), so empty section headers never appear.
       wireFacetVisibility(el);
+      // 6) Mobile: floating filter button + slide-in facet drawer.
+      wireFilterFab(el);
     }).catch(function (err) {
       console.error('[sparq-widget]', err);
       el.innerHTML = '<p style="color:#b91c1c">Search failed to load. Check the Sparq library URL / network.</p>';

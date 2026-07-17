@@ -1,97 +1,132 @@
 /* ============================================================================
-   sparq-overrides.css — theme the Sparq storefront widget by hand.
+   sparq-overrides.css — custom styling layered over the module's base CSS.
 
-   HOW IT WORKS
-   - The widget injects its own base styles first in <head>, so THIS file
-     (loaded after) wins with plain #sparq-widget selectors. No !important.
-   - Three kinds of hooks:
-       1) --sparq-* tokens ....... colors/spacing INSIDE the components
-                                   (checkboxes, slider, pagination, sort…)
-       2) ::part(...) ............ specific parts of a component's shadow DOM
-       3) .sqw-* classes ......... the result CARD + page layout (light DOM)
+   Loads AFTER the module stylesheet, so plain #sparq-widget selectors win —
+   no !important needed. Three hooks are available:
+     1) --sparq-* tokens ....... colors/spacing inside the components
+     2) ::part(...) ............ shadow-DOM internals (docs/styling/anatomy.md)
+     3) .sqw-* classes ......... card + layout markup (light DOM)
 
-   USE IT
-     PrestaShop:  upload to themes/<theme>/assets/css/ and enqueue AFTER the
-                  widget script. Or just <link> it after the widget on any page.
-     Locally:     open preview.html (see the comment at the bottom).
-
-   EDIT the variables in the first block — everything else reads from them.
+   MOBILE FILTER DRAWER (the floating funnel button):
+   The button itself is DOM, not CSS — the storefront widget injects it
+   automatically (elements: button.sqw-filter-fab + div.sqw-drawer-overlay,
+   open-state class `sqw-drawer-open` on #sparq-widget). If your module build
+   doesn't inject it yet, add the 15-line snippet from the integration notes.
+   Every drawer rule below is gated on :has(.sqw-filter-fab), so WITHOUT the
+   button the sidebar safely falls back to stacking above the results.
    ============================================================================ */
 
 #sparq-widget {
-  /* ---- YOUR BRAND (change these) ------------------------------------------ */
-  --sparq-color-primary: #16367d;   /* blue: active page, slider, checkboxes, links */
-  --sparq-color-text:     #1f2937;  /* body text */
-  --sparq-color-border:   #d8dbe0;  /* input/card borders */
-  --sparq-color-bg:       #ffffff;  /* input/button backgrounds */
-  --sparq-color-focus:    #16367d;  /* focus outline */
-  --sparq-radius:         4px;      /* corner rounding */
-  --sparq-spacing:        8px;      /* base spacing unit */
-  --sparq-font-family:    system-ui, Arial, Helvetica, sans-serif;
-
-  /* Card accents (used by the .sqw-* rules below) */
-  --sqw-accent:      #cf1f2b;       /* red: card title bar + sale badge */
-  --sqw-accent-dark: #b41822;
-  --sqw-foot-bg:     #111111;       /* black: price footer */
-  --sqw-card-radius: 4px;
+  /* ---- Brand (edit these) -------------------------------------------------- */
+  --sparq-color-primary: #16367d;   /* blue: FAB, active page, slider, links */
+  --sparq-color-accent:  #cf1f2b;   /* red: card title bar, sale badge */
+  --sqw-fab-bottom: 84px;           /* FAB height above viewport bottom — raised
+                                       so it clears a fixed mobile bottom nav;
+                                       set to 18px if your theme has none */
 }
 
-/* ---- Page chrome --------------------------------------------------------- */
-#sparq-widget .sqw-title      { font-weight: 800; letter-spacing: .04em; }
-#sparq-widget .sqw-breadcrumb a { color: #374151; }
-#sparq-widget .sqw-layout     { gap: 32px; }          /* sidebar ↔ results gap */
-
-/* ---- Facet sidebar ------------------------------------------------------- */
-#sparq-widget .sqw-facet-title { font-size: .8rem; letter-spacing: .06em; color: #111827; }
-/* Bracketed counts like [178] */
-#sparq-widget sparq-filters::part(count) { color: #6b7280; font-variant-numeric: tabular-nums; }
-/* Selected facet row highlight */
-#sparq-widget sparq-filters::part(label-selected) { color: var(--sparq-color-primary); font-weight: 600; }
-/* Sort dropdown */
-#sparq-widget sparq-sort::part(select) { border-color: var(--sparq-color-border); }
-
-/* ---- Pagination ---------------------------------------------------------- */
-#sparq-widget sparq-pagination::part(link)        { min-width: 40px; height: 40px; }
-#sparq-widget sparq-pagination::part(link-active) {
-  background: var(--sparq-color-primary);
-  border-color: var(--sparq-color-primary);
-  color: #fff;
-}
-
-/* ---- Result card --------------------------------------------------------- */
-#sparq-widget .sqw-card {
-  border: 1px solid #e5e7eb;
-  border-radius: var(--sqw-card-radius);
-}
-/* Red title bar */
-#sparq-widget .sqw-card-title {
-  background: linear-gradient(180deg, var(--sqw-accent), var(--sqw-accent-dark));
-  color: #fff;
-  font-size: .82rem;
+/* ---- Toolbar: "SHOWING 4 OUT OF 28" style ---------------------------------- */
+#sparq-widget sparq-stats::part(root) {
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  font-size: .8rem;
   font-weight: 600;
+  color: #111827;
 }
-/* Favorite heart */
-#sparq-widget .sqw-fav               { color: var(--sqw-accent); }
-#sparq-widget .sqw-fav[data-faved="1"] { background: var(--sqw-accent); color: #fff; }
-/* Black price footer */
-#sparq-widget .sqw-card-foot   { background: var(--sqw-foot-bg); color: #fff; }
-#sparq-widget .sqw-price-main  { font-weight: 700; }
-/* Red "Sale price" badge */
-#sparq-widget .sqw-price-sale  { background: var(--sqw-accent); color: #fff; border-radius: 3px; }
-/* Product image area */
-#sparq-widget .sqw-card-img    { aspect-ratio: 4 / 3; background-color: #f3f4f6; }
 
-/* ---- Responsive: card columns (targets the component's slotted grid) ------ */
-#sparq-widget sparq-items::part(list) { gap: 18px; }
-/* Want 4 across on wide screens? uncomment:
-@media (min-width: 1300px) {
-  #sparq-widget sparq-items::part(list) { grid-template-columns: repeat(4, 1fr); }
+/* ============================================================================
+   MOBILE (≤820px) — filters live in a slide-in drawer behind the funnel FAB
+   ============================================================================ */
+
+/* The floating filter button (injected DOM; hidden on desktop) */
+#sparq-widget .sqw-filter-fab {
+  display: none;
+  position: fixed;
+  right: 18px;
+  bottom: var(--sqw-fab-bottom, 18px);
+  z-index: 9992;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 0;
+  background: var(--sparq-color-primary, #16367d);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .3);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
 }
-*/
+#sparq-widget .sqw-filter-fab:active { transform: scale(.94); }
+
+/* Dimmed backdrop behind the open drawer (injected DOM) */
+#sparq-widget .sqw-drawer-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .45);
+  z-index: 9990;
+}
+
+@media (max-width: 820px) {
+  /* Results take the full width; the sidebar leaves the flow */
+  #sparq-widget .sqw-layout { grid-template-columns: 1fr; }
+
+  #sparq-widget .sqw-filter-fab { display: flex; }
+
+  /* Sidebar → off-canvas drawer (only when the FAB exists — see header note) */
+  #sparq-widget:has(.sqw-filter-fab) .sqw-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: min(320px, 85vw);
+    background: #fff;
+    z-index: 9991;
+    padding: 16px 18px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    transform: translateX(-105%);
+    transition: transform .25s ease;
+    box-shadow: 2px 0 18px rgba(0, 0, 0, .18);
+  }
+  #sparq-widget:has(.sqw-filter-fab) .sqw-sidebar::before {
+    content: "FILTER BY";
+    display: block;
+    font-weight: 700;
+    letter-spacing: .06em;
+    font-size: .8rem;
+    color: #111827;
+    margin-bottom: 8px;
+  }
+  #sparq-widget.sqw-drawer-open .sqw-sidebar   { transform: translateX(0); }
+  #sparq-widget.sqw-drawer-open .sqw-drawer-overlay { display: block; }
+
+  /* Toolbar wraps neatly on small screens */
+  #sparq-widget .sqw-toolbar { flex-wrap: wrap; gap: 10px; }
+
+  /* Slightly shorter product images on tablets */
+  #sparq-widget .sqw-card-imglink { height: 190px; }
+}
+
+/* Lock page scroll while the drawer is open */
+body:has(#sparq-widget.sqw-drawer-open) { overflow: hidden; }
+
+/* ---- Phones: keep the 2-column card grid from the design ------------------- */
+@media (max-width: 480px) {
+  #sparq-widget sparq-items::part(list),
+  #sparq-widget sparq-items-infinite::part(list) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  #sparq-widget .sqw-card-imglink { height: 150px; }
+  #sparq-widget .sqw-card-title   { font-size: .72rem; }
+  #sparq-widget .sqw-card-foot    { font-size: .8rem; padding: 8px 10px; }
+  #sparq-widget .sqw-fav          { top: 36px; right: 8px; }
+}
 
 /* ============================================================================
    SEE IT LOCALLY
-   Open preview.html (in this folder) — it loads the widget in demo mode (built-in
-   sample products, no credentials) with THIS stylesheet linked. Edit values
-   above, refresh the page, watch it change.
+     cd examples/sparq-widget && python3 -m http.server 8000
+     open http://localhost:8000/preview.html   (shrink the window ≤820px, or
+     use DevTools device mode, to get the FAB + drawer)
    ============================================================================ */
