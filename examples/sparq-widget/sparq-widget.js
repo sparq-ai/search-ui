@@ -259,13 +259,23 @@
       // sparq-overrides.css (this sheet is first in <head>).
       rootSel + ' .sqw-filter-fab { display: none; position: fixed; right: 18px; bottom: var(--sqw-fab-bottom, 18px); z-index: 9992; width: 56px; height: 56px; border-radius: 50%; border: 0; background: ' + t.primary + '; color: #fff; box-shadow: 0 4px 14px rgba(0,0,0,.3); cursor: pointer; align-items: center; justify-content: center; }',
       rootSel + ' .sqw-drawer-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 9990; }',
+      // Drawer chrome (header with close, footer with Apply) — mobile-only DOM,
+      // hidden on desktop where the sidebar renders inline.
+      rootSel + ' .sqw-drawer-head, ' + rootSel + ' .sqw-drawer-foot { display: none; }',
       '@media (max-width: 820px) {',
       '  ' + rootSel + ' .sqw-layout { grid-template-columns: 1fr; }',
       '  ' + rootSel + ' .sqw-filter-fab { display: flex; }',
       // Drawer styles apply only when the FAB exists (:has) — without it the
       // sidebar falls back to stacking above the results, never unreachable.
-      '  ' + rootSel + ':has(.sqw-filter-fab) .sqw-sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: min(320px, 85vw); background: #fff; z-index: 9991; padding: 16px 18px; overflow-y: auto; transform: translateX(-105%); transition: transform .25s ease; box-shadow: 2px 0 18px rgba(0,0,0,.18); }',
-      '  ' + rootSel + ':has(.sqw-filter-fab) .sqw-sidebar::before { content: "FILTER BY"; display: block; font-weight: 700; letter-spacing: .06em; font-size: .8rem; color: #111827; margin-bottom: 8px; }',
+      '  ' + rootSel + ':has(.sqw-filter-fab) .sqw-sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: min(320px, 85vw); background: #fff; z-index: 9991; padding: 0 18px; overflow-y: auto; transform: translateX(-105%); transition: transform .25s ease; box-shadow: 2px 0 18px rgba(0,0,0,.18); }',
+      // Sticky header: "FILTER BY" + close. Negative margins bleed it to the
+      // drawer edges past the sidebar's horizontal padding.
+      '  ' + rootSel + ' .sqw-drawer-head { display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1; margin: 0 -18px; padding: 14px 18px; background: #fff; border-bottom: 1px solid #e5e7eb; font-weight: 700; letter-spacing: .06em; font-size: .8rem; color: #111827; text-transform: uppercase; }',
+      '  ' + rootSel + ' .sqw-drawer-close { border: 0; background: none; font-size: 24px; line-height: 1; color: #374151; cursor: pointer; padding: 0 2px; }',
+      // Sticky footer: full-width Apply (facets apply live; this closes the
+      // drawer to reveal the results).
+      '  ' + rootSel + ' .sqw-drawer-foot { display: block; position: sticky; bottom: 0; margin: 0 -18px; padding: 12px 18px; background: #fff; border-top: 1px solid #e5e7eb; }',
+      '  ' + rootSel + ' .sqw-drawer-apply { width: 100%; border: 0; border-radius: 4px; background: ' + t.primary + '; color: #fff; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; padding: 12px; cursor: pointer; }',
       '  ' + rootSel + '.sqw-drawer-open .sqw-sidebar { transform: translateX(0); }',
       '  ' + rootSel + '.sqw-drawer-open .sqw-drawer-overlay { display: block; }',
       '}',
@@ -510,6 +520,7 @@
   // in/out. Shown only ≤820px (CSS); a click outside or Escape closes it.
   function wireFilterFab(root) {
     if (root.querySelector('.sqw-filter-fab')) return;
+    var close = function () { root.classList.remove('sqw-drawer-open'); };
     var overlay = document.createElement('div');
     overlay.className = 'sqw-drawer-overlay';
     var fab = document.createElement('button');
@@ -518,12 +529,43 @@
     fab.setAttribute('aria-label', 'Show filters');
     fab.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="22 3 2 3 10 12.5 10 19 14 21 14 12.5 22 3"></polygon></svg>';
     fab.addEventListener('click', function () { root.classList.toggle('sqw-drawer-open'); });
-    overlay.addEventListener('click', function () { root.classList.remove('sqw-drawer-open'); });
+    overlay.addEventListener('click', close);
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') root.classList.remove('sqw-drawer-open');
+      if (e.key === 'Escape') close();
     });
     root.appendChild(overlay);
     root.appendChild(fab);
+
+    // Drawer chrome: sticky "FILTER BY ×" header and a sticky Apply footer.
+    // Facets apply live as they're toggled — Apply closes the drawer to show
+    // the results. Both are display:none on desktop.
+    var sidebar = root.querySelector('.sqw-sidebar');
+    if (sidebar && !sidebar.querySelector('.sqw-drawer-head')) {
+      var head = document.createElement('div');
+      head.className = 'sqw-drawer-head';
+      var title = document.createElement('span');
+      title.className = 'sqw-drawer-title';
+      title.textContent = 'Filter By';
+      var closeBtn = document.createElement('button');
+      closeBtn.type = 'button';
+      closeBtn.className = 'sqw-drawer-close';
+      closeBtn.setAttribute('aria-label', 'Close filters');
+      closeBtn.innerHTML = '&times;';
+      closeBtn.addEventListener('click', close);
+      head.appendChild(title);
+      head.appendChild(closeBtn);
+      sidebar.insertBefore(head, sidebar.firstChild);
+
+      var foot = document.createElement('div');
+      foot.className = 'sqw-drawer-foot';
+      var apply = document.createElement('button');
+      apply.type = 'button';
+      apply.className = 'sqw-drawer-apply';
+      apply.textContent = 'Apply';
+      apply.addEventListener('click', close);
+      foot.appendChild(apply);
+      sidebar.appendChild(foot);
+    }
   }
 
   function wireFavorites(root) {
