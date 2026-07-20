@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, useHost, watchEffect } from 'vue';
-import { parseNumAttr } from '../attrs';
+import { parseBoolAttr, parseNumAttr } from '../attrs';
 import { useController } from '../composables/useController';
 import {
   clampThumb,
@@ -24,6 +24,11 @@ if (!attribute) console.error('[sparq] <sparq-range> requires an attribute="..."
 const { controller } = useController({ role: 'range', numericAttribute: attribute ?? undefined });
 
 const prefix = host.getAttribute('prefix') ?? '';
+// A range had no heading of its own, so a sidebar that labels its facets had to
+// wrap it — the same wrapper that then needs hiding when the widget is empty.
+const header = host.getAttribute('header');
+const collapsible = parseBoolAttr(host.getAttribute('collapsible'));
+const isCollapsed = ref(collapsible && parseBoolAttr(host.getAttribute('collapsed')));
 const step = parseNumAttr(host.getAttribute('step'), 1);
 const attrMin = host.getAttribute('min');
 const attrMax = host.getAttribute('max');
@@ -175,7 +180,21 @@ onBeforeUnmount(() => clearTimeout(applyTimer));
 </script>
 
 <template>
-  <div class="sq-root" part="root" role="group" :aria-label="`${attribute ?? ''} range`">
+  <div class="sq-root" part="root" role="group" :aria-label="`${header ?? attribute ?? ''} range`">
+    <button
+      v-if="header && collapsible"
+      class="header header-toggle"
+      part="header"
+      type="button"
+      :aria-expanded="isCollapsed ? 'false' : 'true'"
+      @click="isCollapsed = !isCollapsed"
+    >
+      <span class="header-text">{{ header }}</span>
+      <span class="caret" part="caret" :class="{ collapsed: isCollapsed }" aria-hidden="true"></span>
+    </button>
+    <div v-else-if="header" class="header" part="header">{{ header }}</div>
+
+    <div v-show="!isCollapsed" class="body" part="body">
     <div
       ref="sliderEl"
       class="slider"
@@ -249,10 +268,48 @@ onBeforeUnmount(() => clearTimeout(applyTimer));
         @change="onTypedChange"
       />
     </div>
+    </div>
   </div>
 </template>
 
 <style>
+.header {
+  font-weight: 600;
+  margin-bottom: calc(var(--sparq-spacing, 8px));
+}
+.header-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--sparq-spacing, 8px));
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+.caret {
+  flex: 0 0 auto;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid currentColor;
+  transform: rotate(180deg);
+  transition: transform 0.15s ease;
+}
+.caret.collapsed {
+  transform: rotate(0deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .caret {
+    transition: none;
+  }
+}
 /* Fixed height from first paint — bounds arriving later must not shift layout. */
 .slider {
   position: relative;

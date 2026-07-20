@@ -24,6 +24,8 @@ That's what makes both halves work with a single request: selecting any level fi
 | `header` | — | Heading above the tree |
 | `separator` | `>>>` | Path delimiter in your data |
 | `max-depth` | `3` | Levels rendered; deeper paths are ignored |
+| `collapsible` | off | Makes the header a toggle button that shows/hides the body |
+| `collapsed` | off | Start collapsed (only meaningful with `collapsible`) |
 | `for` | — | Provider `id` |
 
 ## Behavior
@@ -40,7 +42,7 @@ That's what makes both halves work with a single request: selecting any level fi
 
 ## Shadow parts
 
-`root`, `header`, `list`, `item`, `node` / `node-selected`, `count`
+`root`, `header`, `list`, `item`, `node` / `node-selected`, `count`, `caret`, `body`
 
 ```css
 sparq-menu::part(node-selected) { color: #111; }

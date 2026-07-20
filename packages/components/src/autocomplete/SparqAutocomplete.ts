@@ -253,7 +253,16 @@ export class SparqAutocompleteElement extends HTMLElement {
     this.sectionsHost.textContent = '';
     this.sectionEls = this.readings.map((reading, index) => {
       const section = document.createElement('section');
-      section.setAttribute('part', 'section');
+      // Every section also carries an index-based part, and a slug of its title
+      // when it has one, so a host page can style one source differently from
+      // another ("categories in a narrow column, products in a grid"). With only
+      // the shared `section` part they are indistinguishable from CSS.
+      const parts = ['section', `section-${index}`];
+      const slug = slugifyPart(reading.title);
+      if (slug) {
+        parts.push(`section-${slug}`);
+      }
+      section.setAttribute('part', parts.join(' '));
       section.setAttribute('role', 'group');
       section.hidden = true;
       if (reading.title) {
@@ -571,4 +580,17 @@ export class SparqAutocompleteElement extends HTMLElement {
     this.panel.style.minWidth = `${placement.minWidth}px`;
     this.panel.style.maxHeight = `${placement.maxHeight}px`;
   }
+}
+
+/**
+ * A title turned into a CSS part token: lowercase, non-alphanumerics collapsed
+ * to dashes. Returns '' when nothing usable is left, so an untitled or
+ * symbol-only section simply falls back to its index-based part.
+ */
+export function slugifyPart(title: string | undefined | null): string {
+  if (!title) return '';
+  return String(title)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 }

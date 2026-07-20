@@ -13,7 +13,10 @@ Dual-thumb slider plus min/max number inputs for filtering a numeric attribute (
 | `attribute` * | — | Numeric attribute to filter |
 | `min` / `max` | from stats | Fix the slider bounds instead of deriving them from results |
 | `step` | `1` | Slider/keyboard/input step |
+| `header` | — | Heading above the slider |
 | `prefix` | — | Symbol shown before the inputs and in screen-reader value text (`$`, `€`, …) |
+| `collapsible` | off | Makes the header a toggle button that shows/hides the body |
+| `collapsed` | off | Start collapsed (only meaningful with `collapsible`) |
 | `for` | — | Provider `id` |
 
 ## Interaction model
@@ -37,7 +40,7 @@ Bounds come from the result stats and adapt as the query changes — but they **
 
 ## Shadow parts
 
-`root`, `slider`, `track`, `fill`, `range-min`, `range-max`, `prefix`, `input-min`, `input-max`, `separator`
+`root`, `slider`, `track`, `fill`, `range-min`, `range-max`, `prefix`, `input-min`, `input-max`, `separator`, `header`, `caret`, `body`
 
 ```css
 sparq-range::part(fill) { background: #059669; }

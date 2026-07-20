@@ -18,6 +18,11 @@ if (!attribute) console.error('[sparq] <sparq-filters> requires an attribute="..
 const { controller } = useController({ role: 'filters', facetAttribute: attribute ?? undefined });
 
 const header = host.getAttribute('header');
+// Collapsible sections are how storefront facet sidebars usually look; without
+// them every integration wraps this widget in its own accordion, which then has
+// to be hidden separately when the widget renders nothing.
+const collapsible = parseBoolAttr(host.getAttribute('collapsible'));
+const isCollapsed = ref(collapsible && parseBoolAttr(host.getAttribute('collapsed')));
 const limit = parseNumAttr(host.getAttribute('limit'), 10);
 const showMore = parseBoolAttr(host.getAttribute('show-more'));
 const searchable = parseBoolAttr(host.getAttribute('searchable'));
@@ -118,13 +123,28 @@ function swatchKind(value: string): string {
 
 <template>
   <div v-if="values.length > 0 || searchTerm" class="sq-root" part="root">
-    <div v-if="header" class="header" part="header">{{ header }}</div>
+    <!-- A collapsible header is a real <button> so it is focusable and
+         announces its state; the static one stays a plain div as before. -->
+    <button
+      v-if="header && collapsible"
+      class="header header-toggle"
+      part="header"
+      type="button"
+      :aria-expanded="isCollapsed ? 'false' : 'true'"
+      @click="isCollapsed = !isCollapsed"
+    >
+      <span class="header-text">{{ header }}</span>
+      <span class="caret" part="caret" :class="{ collapsed: isCollapsed }" aria-hidden="true"></span>
+    </button>
+    <div v-else-if="header" class="header" part="header">{{ header }}</div>
+
+    <div v-show="!isCollapsed" class="body" part="body">
     <input
       v-if="searchable"
       class="search"
       part="search-input"
       type="search"
-      :placeholder="`Search ${attribute ?? ''}…`"
+      :placeholder="`Search ${header ?? attribute ?? ''}…`"
       :value="searchTerm"
       @input="searchTerm = ($event.target as HTMLInputElement).value"
     />
@@ -198,6 +218,7 @@ function swatchKind(value: string): string {
     >
       {{ expanded ? 'Show less' : 'Show more' }}
     </button>
+    </div>
   </div>
 </template>
 
@@ -205,6 +226,41 @@ function swatchKind(value: string): string {
 .header {
   font-weight: 600;
   margin-bottom: calc(var(--sparq-spacing, 8px));
+}
+/* Reset the button back to looking like the static header, so turning on
+   `collapsible` changes behaviour without changing the design. */
+.header-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--sparq-spacing, 8px));
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+.caret {
+  flex: 0 0 auto;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid currentColor;
+  transform: rotate(180deg);
+  transition: transform 0.15s ease;
+}
+.caret.collapsed {
+  transform: rotate(0deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .caret {
+    transition: none;
+  }
 }
 .search {
   width: 100%;

@@ -95,6 +95,7 @@ Item markup is your own light DOM — style it with normal page CSS. The active 
 sparq-autocomplete [data-sparq-ac-wrapper][data-active] { background: #f3f4f6; }
 ```
 
-Panel chrome via parts and tokens: parts `root`, `panel`, `section`, `section-title`, `view-all`; tokens include `--sparq-z-popup` (default 9999) and `--sparq-ac-active-bg`.
+Panel chrome via parts and tokens: parts `root`, `panel`, `section`, `section-title`, `view-all`;
+each section also carries `section-<index>` and, when it has a title, `section-<slug>` (e.g. `section-0 section-categories`) so sources can be styled individually; tokens include `--sparq-z-popup` (default 9999) and `--sparq-ac-active-bg`.
 
 > **Stacking-context gotcha:** the panel is `position: fixed`, which a `transform`/`filter` on an ancestor (common on sticky Shopify headers) will capture. If the panel clips or misplaces, move `<sparq-autocomplete>` to be a direct child of `<body>` — it finds its input anywhere via the selector.
