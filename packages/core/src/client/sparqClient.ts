@@ -90,7 +90,9 @@ export function createSparqClient(cfg: SparqClientConfig): SparqClient {
         count: req.itemsPerPage,
         fields: req.returnFields?.length ? req.returnFields : ['*'],
       };
-      if (req.sort) body.sort = [toWireSort(req.sort)];
+      if (req.sort) {
+        body.sort = Array.isArray(req.sort) ? req.sort.map(toWireSort) : [toWireSort(req.sort)];
+      }
       if (req.facets.length > 0) {
         body.textFacets = req.facets;
         body.facetCount = 100;
@@ -105,6 +107,8 @@ export function createSparqClient(cfg: SparqClientConfig): SparqClient {
       const filter = buildFilterString(req);
       if (filter) body.filter = filter;
       if (req.searchFields?.length) body.searchFields = req.searchFields;
+      // Last, so an integration can override anything built above.
+      if (req.raw) Object.assign(body, req.raw);
 
       let httpRes: Response;
       try {

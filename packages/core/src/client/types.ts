@@ -7,7 +7,13 @@ export interface SearchRequest {
   /** 0-based. */
   page: number;
   itemsPerPage: number;
-  sort: string | null;
+  /**
+   * One sort key, or several in priority order. An array is what the API needs
+   * for a tiebreak: ["-_rank", "-price"] keeps relevance primary and orders
+   * equally-relevant hits by price. A comma-joined string does NOT work — the
+   * API reads one key per array element.
+   */
+  sort: string | string[] | null;
   /** Text facet attributes to return counts for. */
   facets: string[];
   /** Numeric facet attributes to return stats for. */
@@ -18,6 +24,13 @@ export interface SearchRequest {
   returnFields?: string[];
   /** Raw filter-string escape hatch, passed through to the API verbatim. */
   filter?: string;
+  /**
+   * Extra body fields merged into the request verbatim, last. The escape hatch
+   * for anything this interface does not model yet — an integration can reach a
+   * new API field without waiting for a library release. Nothing validates it,
+   * so a wrong key is simply sent and rejected by the API.
+   */
+  raw?: Record<string, unknown>;
 }
 
 /** Normalized response. The adapter maps API wire fields into this. */

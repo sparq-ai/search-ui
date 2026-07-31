@@ -130,3 +130,61 @@ describe('sparqClient — response mapping (verified live shape)', () => {
     await expect(client.search(req())).rejects.toMatchObject({ type: 'network', retryable: true });
   });
 });
+
+describe('multi-key sort', () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('sends each key as its own array element, in priority order', async () => {
+    const spy = stubFetch(WIRE_OK);
+    const client = createSparqClient({ appId: 'app', apiKey: 'k' });
+
+    await client.search(req({ sort: ['-_rank', '-price'] }));
+    expect(bodyOf(spy, 0).sort).toEqual(['-_rank', '-price']);
+  });
+
+  it('still translates "field:desc" inside an array', async () => {
+    const spy = stubFetch(WIRE_OK);
+    const client = createSparqClient({ appId: 'app', apiKey: 'k' });
+
+    await client.search(req({ sort: ['-_rank', 'price:desc', 'title:asc'] }));
+    expect(bodyOf(spy, 0).sort).toEqual(['-_rank', '-price', 'title']);
+  });
+
+  it('leaves a single string key working as before', async () => {
+    const spy = stubFetch(WIRE_OK);
+    const client = createSparqClient({ appId: 'app', apiKey: 'k' });
+
+    await client.search(req({ sort: 'price:desc' }));
+    expect(bodyOf(spy, 0).sort).toEqual(['-price']);
+  });
+});
+
+describe('raw escape hatch', () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('merges unmodelled fields into the body verbatim', async () => {
+    const spy = stubFetch(WIRE_OK);
+    const client = createSparqClient({ appId: 'app', apiKey: 'k' });
+
+    await client.search(req({ raw: { typoTolerance: 2, groupCount: -1 } }));
+    const body = bodyOf(spy, 0);
+    expect(body.typoTolerance).toBe(2);
+    expect(body.groupCount).toBe(-1);
+  });
+
+  it('is applied last, so it can override a field the client built', async () => {
+    const spy = stubFetch(WIRE_OK);
+    const client = createSparqClient({ appId: 'app', apiKey: 'k' });
+
+    await client.search(req({ facets: ['brand'], raw: { facetCount: 5 } }));
+    expect(bodyOf(spy, 0).facetCount).toBe(5);
+  });
+
+  it('changes nothing when absent', async () => {
+    const spy = stubFetch(WIRE_OK);
+    const client = createSparqClient({ appId: 'app', apiKey: 'k' });
+
+    await client.search(req());
+    expect(bodyOf(spy, 0)).not.toHaveProperty('raw');
+  });
+});
