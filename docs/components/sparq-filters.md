@@ -32,6 +32,8 @@ Filter on one text facet attribute. Five rendering modes via the `mode` attribut
 | `show-more` | off | Adds the Show more / Show less toggle |
 | `searchable` | off | Adds a small search input to filter long value lists |
 | `sort-by` | `count` | `count` (descending) or `alpha` |
+| `collapsible` | off | Makes the header a toggle button that shows/hides the body |
+| `collapsed` | off | Start collapsed (only meaningful with `collapsible`) |
 | `for` | — | Provider `id` |
 
 ## Color codes (`swatch` / `color-list`)
@@ -66,7 +68,7 @@ document.querySelector('sparq-filters[attribute="system_vendor"]').transformValu
 
 ## Shadow parts
 
-`root`, `header`, `search-input`, `list`, `item`, `label`, `checkbox`, `count`, `show-more-button`; pill mode adds `pill` / `pill-selected`; swatch modes add `swatch` / `swatch-selected`.
+`root`, `header`, `search-input`, `list`, `item`, `label`, `checkbox`, `count`, `show-more-button`; pill mode adds `pill` / `pill-selected`; swatch modes add `swatch` / `swatch-selected`., `caret`, `body`
 
 ```css
 sparq-filters::part(count) { font-variant-numeric: tabular-nums; }

@@ -59,6 +59,8 @@ Parts vary by `mode`. Common:
 |---|---|---|
 | `root` | wrapper `div` | always |
 | `header` | heading `div` | `header` attribute set |
+| `caret` | caret `span` inside the header | `collapsible` |
+| `body` | wrapper `div` around everything below the header | `collapsible` |
 | `search-input` | `input type="search"` | `searchable` |
 | `list` | `ul` (checkbox/single/color-list) or `div` (pill/swatch grids) | always |
 | `count` | count `span` | per value (not in swatch mode — count lives in the tooltip/aria-label) |
@@ -100,6 +102,7 @@ sparq-filters::part(swatch-selected) { outline: 2px solid #111; }
 |---|---|---|
 | `root` | wrapper `div` | always |
 | `header` | heading `div` | `header` attribute set |
+| `caret` | caret `span` inside the header | `collapsible` |
 | `list` | `ul` (role=tree) | always |
 | `item` | `li` | per visible node |
 | `node` | node `button` (indented by depth) | per visible node |
@@ -141,6 +144,9 @@ sparq-pagination::part(link-active) { box-shadow: 0 0 0 3px rgba(37, 99, 235, .3
 | Part | Element | Appears |
 |---|---|---|
 | `root` | wrapper `div` | always |
+| `header` | heading `div` | `header` attribute set |
+| `caret` | caret `span` inside the header | `collapsible` |
+| `body` | wrapper `div` around the slider and inputs | `collapsible` |
 | `slider` | slider container `div` (pointer surface) | always |
 | `track` | background rail `div` | always |
 | `fill` | selected-span `div` | always |

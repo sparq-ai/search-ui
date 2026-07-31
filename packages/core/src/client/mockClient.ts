@@ -84,13 +84,25 @@ export function createMockClient(
       let matched = dataset.filter((item) => baseMatch(item));
 
       if (req.sort) {
-        const [field, dir] = req.sort.split(':');
-        const mul = dir === 'desc' ? -1 : 1;
+        // Several keys sort in priority order, each one breaking the previous
+        // key's ties — matching the API. Both spellings are accepted, "-field"
+        // as the wire form and "field:desc" as the UI form.
+        const keys = (Array.isArray(req.sort) ? req.sort : [req.sort]).map((key) => {
+          if (key.startsWith('-')) return { field: key.slice(1), mul: -1 };
+          const [field, dir] = key.split(':');
+          return { field: field ?? '', mul: dir === 'desc' ? -1 : 1 };
+        });
         matched = [...matched].sort((a, b) => {
-          const av = a[field ?? ''];
-          const bv = b[field ?? ''];
-          if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * mul;
-          return String(av).localeCompare(String(bv)) * mul;
+          for (const { field, mul } of keys) {
+            const av = a[field];
+            const bv = b[field];
+            const cmp =
+              typeof av === 'number' && typeof bv === 'number'
+                ? av - bv
+                : String(av).localeCompare(String(bv));
+            if (cmp !== 0) return cmp * mul;
+          }
+          return 0;
         });
       }
 

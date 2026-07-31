@@ -15,7 +15,7 @@ import { dispatchSparqEvent } from '../events';
 import { RESET_CSS } from '../styles/reset';
 import { createLazyClient } from '../clientResolution';
 import { AC_CSS } from './acStyles';
-import { buildSearchUrl, computePanelPlacement, moveActive, viewAllLabel } from './acLogic';
+import { buildSearchUrl, computePanelPlacement, moveActive, panelAction, viewAllLabel } from './acLogic';
 import { applyComboboxAria, isTextInput, restoreAria, setExpanded } from './externalInput';
 import type { AcSourceReading, SparqAcSourceElement } from './SparqAcSource';
 
@@ -253,7 +253,16 @@ export class SparqAutocompleteElement extends HTMLElement {
     this.sectionsHost.textContent = '';
     this.sectionEls = this.readings.map((reading, index) => {
       const section = document.createElement('section');
-      section.setAttribute('part', 'section');
+      // Every section also carries an index-based part, and a slug of its title
+      // when it has one, so a host page can style one source differently from
+      // another ("categories in a narrow column, products in a grid"). With only
+      // the shared `section` part they are indistinguishable from CSS.
+      const parts = ['section', `section-${index}`];
+      const slug = slugifyPart(reading.title);
+      if (slug) {
+        parts.push(`section-${slug}`);
+      }
+      section.setAttribute('part', parts.join(' '));
       section.setAttribute('role', 'group');
       section.hidden = true;
       if (reading.title) {
@@ -349,15 +358,17 @@ export class SparqAutocompleteElement extends HTMLElement {
 
     this.setActive(-1, { scroll: false });
 
-    // Openness policy.
-    if (mode === 'inactive') {
-      this.closePanel();
-      return;
-    }
-    const hasContent = this.flatItems.length > 0 || showViewAll;
-    if (hasContent && this.anchorFocused()) this.openPanel();
-    else if (this.open && !hasContent && aggregateStatus === 'success') this.closePanel();
-    else if (this.open) this.scheduleReposition();
+    // Openness policy — see panelAction() for the rules.
+    const action = panelAction({
+      open: this.open,
+      mode,
+      hasContent: this.flatItems.length > 0 || showViewAll,
+      status: aggregateStatus,
+      anchorFocused: this.anchorFocused(),
+    });
+    if (action === 'open') this.openPanel();
+    else if (action === 'close') this.closePanel();
+    else if (action === 'reposition') this.scheduleReposition();
   }
 
   // ── anchor + events ─────────────────────────────────────────────────────
@@ -571,4 +582,17 @@ export class SparqAutocompleteElement extends HTMLElement {
     this.panel.style.minWidth = `${placement.minWidth}px`;
     this.panel.style.maxHeight = `${placement.maxHeight}px`;
   }
+}
+
+/**
+ * A title turned into a CSS part token: lowercase, non-alphanumerics collapsed
+ * to dashes. Returns '' when nothing usable is left, so an untitled or
+ * symbol-only section simply falls back to its index-based part.
+ */
+export function slugifyPart(title: string | undefined | null): string {
+  if (!title) return '';
+  return String(title)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 }

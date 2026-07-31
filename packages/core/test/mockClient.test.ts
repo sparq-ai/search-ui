@@ -134,3 +134,25 @@ describe('mockClient — multi-collection record datasets', () => {
     expect(res.totalItems).toBe(4);
   });
 });
+
+describe('mock client — multi-key sort', () => {
+  it('breaks ties with the second key, in priority order', async () => {
+    const client = createMockClient([
+      { id: '1', title: 'b', rank: 1, price: 10 },
+      { id: '2', title: 'a', rank: 1, price: 30 },
+      { id: '3', title: 'c', rank: 2, price: 20 },
+    ]);
+    const res = await client.search(req({ sort: ['-rank', '-price'] }));
+    // rank 2 first, then the rank-1 pair ordered by price descending
+    expect(res.items.map((i) => i.id)).toEqual(['3', '2', '1']);
+  });
+
+  it('accepts the "field:desc" spelling alongside the wire form', async () => {
+    const client = createMockClient([
+      { id: '1', price: 10 },
+      { id: '2', price: 30 },
+    ]);
+    const res = await client.search(req({ sort: ['price:desc'] }));
+    expect(res.items.map((i) => i.id)).toEqual(['2', '1']);
+  });
+});
