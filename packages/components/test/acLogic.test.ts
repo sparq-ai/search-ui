@@ -3,6 +3,7 @@ import {
   buildSearchUrl,
   computePanelPlacement,
   moveActive,
+  panelAction,
   viewAllLabel,
 } from '../src/autocomplete/acLogic';
 
@@ -104,5 +105,46 @@ describe('viewAllLabel', () => {
     expect(viewAllLabel('View all {count} results', 128)).toBe('View all 128 results');
     expect(viewAllLabel('{count} matches — see {count}', 3)).toBe('3 matches — see 3');
     expect(viewAllLabel('Show everything', 9)).toBe('Show everything');
+  });
+});
+
+describe('panelAction — openness policy', () => {
+  const base = {
+    open: true,
+    mode: 'query' as const,
+    hasContent: true,
+    status: 'success' as const,
+    anchorFocused: true,
+  };
+
+  it('opens when there is content and the anchor has focus', () => {
+    expect(panelAction({ ...base, open: false })).toBe('open');
+  });
+
+  it('closes in inactive mode regardless of content', () => {
+    expect(panelAction({ ...base, mode: 'inactive' })).toBe('close');
+    expect(panelAction({ ...base, mode: 'inactive', hasContent: false })).toBe('close');
+  });
+
+  // The regression: clearing the input leaves mode 'empty' with no source run,
+  // so status stays 'idle'. A success-only rule left the panel open and empty.
+  it('closes an emptied panel while the status is still idle', () => {
+    expect(panelAction({ ...base, mode: 'empty', hasContent: false, status: 'idle' })).toBe('close');
+  });
+
+  it('closes an empty panel once a run has succeeded', () => {
+    expect(panelAction({ ...base, hasContent: false, status: 'success' })).toBe('close');
+  });
+
+  it('does not close mid-request, so a populated panel never flickers', () => {
+    expect(panelAction({ ...base, hasContent: false, status: 'loading' })).toBe('reposition');
+  });
+
+  it('repositions an open panel that keeps its content but has lost focus', () => {
+    expect(panelAction({ ...base, anchorFocused: false })).toBe('reposition');
+  });
+
+  it('does nothing when a closed panel has nothing to show', () => {
+    expect(panelAction({ ...base, open: false, hasContent: false, status: 'idle' })).toBe('none');
   });
 });

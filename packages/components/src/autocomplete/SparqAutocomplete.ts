@@ -15,7 +15,7 @@ import { dispatchSparqEvent } from '../events';
 import { RESET_CSS } from '../styles/reset';
 import { createLazyClient } from '../clientResolution';
 import { AC_CSS } from './acStyles';
-import { buildSearchUrl, computePanelPlacement, moveActive, viewAllLabel } from './acLogic';
+import { buildSearchUrl, computePanelPlacement, moveActive, panelAction, viewAllLabel } from './acLogic';
 import { applyComboboxAria, isTextInput, restoreAria, setExpanded } from './externalInput';
 import type { AcSourceReading, SparqAcSourceElement } from './SparqAcSource';
 
@@ -358,15 +358,17 @@ export class SparqAutocompleteElement extends HTMLElement {
 
     this.setActive(-1, { scroll: false });
 
-    // Openness policy.
-    if (mode === 'inactive') {
-      this.closePanel();
-      return;
-    }
-    const hasContent = this.flatItems.length > 0 || showViewAll;
-    if (hasContent && this.anchorFocused()) this.openPanel();
-    else if (this.open && !hasContent && aggregateStatus === 'success') this.closePanel();
-    else if (this.open) this.scheduleReposition();
+    // Openness policy — see panelAction() for the rules.
+    const action = panelAction({
+      open: this.open,
+      mode,
+      hasContent: this.flatItems.length > 0 || showViewAll,
+      status: aggregateStatus,
+      anchorFocused: this.anchorFocused(),
+    });
+    if (action === 'open') this.openPanel();
+    else if (action === 'close') this.closePanel();
+    else if (action === 'reposition') this.scheduleReposition();
   }
 
   // ── anchor + events ─────────────────────────────────────────────────────

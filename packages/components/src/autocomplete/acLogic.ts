@@ -71,3 +71,25 @@ export function buildSearchUrl(searchUrl: string, queryParam: string, query: str
 export function viewAllLabel(template: string, count: number): string {
   return template.replace(/\{count\}/g, String(count));
 }
+
+/**
+ * What the panel should do after a render: open, close, or stay put.
+ *
+ * 'close' on any settled status, not just 'success'. Clearing the input settles
+ * to 'empty' mode, where no source runs — the status stays 'idle' and never
+ * reaches 'success', so a success-only rule left an open panel showing stale
+ * section headers with nothing under them. 'loading' is still excluded so an
+ * in-flight request never closes a populated panel mid-keystroke.
+ */
+export function panelAction(input: {
+  open: boolean;
+  mode: 'inactive' | 'empty' | 'query';
+  hasContent: boolean;
+  status: 'idle' | 'loading' | 'success';
+  anchorFocused: boolean;
+}): 'open' | 'close' | 'reposition' | 'none' {
+  if (input.mode === 'inactive') return 'close';
+  if (input.hasContent && input.anchorFocused) return 'open';
+  if (input.open && !input.hasContent && input.status !== 'loading') return 'close';
+  return input.open ? 'reposition' : 'none';
+}
