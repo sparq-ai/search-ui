@@ -68,7 +68,7 @@ string does *not* work.
 
 ```js
 hooks = {
-  // Relevance first; equally-relevant hits ordered by price, high to low.
+  // Relevance first; equally-relevant items ordered by price, high to low.
   transformRequest: (req) => ({ ...req, sort: ['-_rank', '-price'] }),
 };
 ```

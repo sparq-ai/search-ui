@@ -10,7 +10,7 @@ export interface SearchRequest {
   /**
    * One sort key, or several in priority order. An array is what the API needs
    * for a tiebreak: ["-_rank", "-price"] keeps relevance primary and orders
-   * equally-relevant hits by price. A comma-joined string does NOT work — the
+   * equally-relevant items by price. A comma-joined string does NOT work — the
    * API reads one key per array element.
    */
   sort: string | string[] | null;
