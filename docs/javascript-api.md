@@ -57,6 +57,35 @@ document.querySelector('sparq-search').hooks = {
 
 Async hooks are awaited inside the request pipeline and stay race-safe — a stale transformed response is discarded, never rendered.
 
+#### Shaping the request
+
+`transformRequest` receives the normalized `SearchRequest`, so anything on it can
+be set per integration. Two fields exist for cases the interface does not cover:
+
+**`sort` accepts several keys**, applied in priority order — each one breaks the
+previous key's ties. The API reads one key per array element, so a comma-joined
+string does *not* work.
+
+```js
+hooks = {
+  // Relevance first; equally-relevant hits ordered by price, high to low.
+  transformRequest: (req) => ({ ...req, sort: ['-_rank', '-price'] }),
+};
+```
+
+Sort chosen in the UI stays a single string and is what round-trips through the
+URL; an array is an integration-level override applied after routing.
+
+**`raw` merges straight into the request body**, last, so it can also override a
+field the client built. It is the escape hatch for API fields this interface does
+not model yet — nothing validates it, so an unknown key is simply sent.
+
+```js
+hooks = {
+  transformRequest: (req) => ({ ...req, raw: { typoTolerance: 2, facetCount: 5 } }),
+};
+```
+
 ### Widget-level hook properties
 
 | Property | On | Purpose |
