@@ -31,9 +31,14 @@ const api = {
 
 /**
  * window.sparq('purchase', {...}) — the one call merchants place on the order
- * confirmation page. Command-style so future verbs need no API change, and so
- * platform snippets can call it defensively (window.sparq && window.sparq(...)).
+ * confirmation page. Command-style so future verbs need no API change.
  * 'init' configures insights on pages without a <sparq-search> element.
+ *
+ * Calls made BEFORE this script executes are not lost: host pages use the
+ * standard pre-load stub
+ *   window.sparq = window.sparq || function(){(window.sparq.q = window.sparq.q || []).push(arguments)};
+ * and the queue is drained (in order) the moment the real implementation
+ * installs below.
  */
 function sparq(command: 'purchase', data: PurchaseData): void;
 function sparq(command: 'init', data: InsightsConfig): void;
@@ -43,17 +48,29 @@ function sparq(command: string, data: unknown): void {
   else console.error(`[sparq] unknown command "${command}"`);
 }
 
+type SparqStub = typeof sparq & { q?: IArguments[] };
+
 declare global {
   interface Window {
     SparqSearchUI?: typeof api;
-    sparq?: typeof sparq;
+    sparq?: SparqStub;
   }
 }
 
 // The global MUST exist before register() dispatches sparq:ready — that event
 // is the documented moment to call SparqSearchUI.configure()/setClient().
 window.SparqSearchUI = api;
+const queued = window.sparq?.q;
 window.sparq = sparq;
+if (Array.isArray(queued)) {
+  for (const args of queued) {
+    try {
+      sparq(args[0] as never, args[1] as never);
+    } catch {
+      /* one bad queued call must not drop the rest */
+    }
+  }
+}
 register();
 
 export default api;

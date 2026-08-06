@@ -7,7 +7,12 @@ import { fileURLToPath } from 'node:url';
 const root = fileURLToPath(new URL('..', import.meta.url));
 const BANNED = /\bhits?\b/i;
 const SCAN_DIRS = ['packages/core/src', 'packages/components/src', 'playground', 'e2e', 'docs'];
-const ALLOWLIST = new Set(['packages/core/src/client/sparqClient.ts']);
+const ALLOWLIST = new Set([
+  'packages/core/src/client/sparqClient.ts',
+  // Second wire seam (ARCHITECTURE §20): the insights event payloads reuse the
+  // st-tracking wire field `totalHits` for analytics-js compatibility.
+  'packages/core/src/insights/insights.ts',
+]);
 const EXTENSIONS = new Set(['.ts', '.vue', '.js', '.mjs', '.html', '.css', '.md']);
 
 const violations = [];

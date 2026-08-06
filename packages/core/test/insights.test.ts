@@ -4,17 +4,24 @@ import { Insights } from '../src/insights/insights';
 import { clearClickMap, queryIdFor, rememberClick } from '../src/insights/clickMap';
 import { recordingClient, response, tick } from './helpers';
 
-type G = typeof globalThis & Record<string, unknown>;
-const g = globalThis as G;
+// The insights module touches window/document/localStorage/fetch; tests run in
+// plain Node, so the DOM globals are stubbed. Everything goes through this
+// loosely-typed view of globalThis — vitest doesn't typecheck, but core's build
+// gate (tsc --noEmit) does, and the stubs are deliberately partial.
+const g = globalThis as unknown as Record<string, unknown>;
 
-function stubStorage() {
+function stubStorage(): Storage {
   const store = new Map<string, string>();
   return {
     getItem: (k: string) => (store.has(k) ? store.get(k)! : null),
     setItem: (k: string, v: string) => void store.set(k, String(v)),
     removeItem: (k: string) => void store.delete(k),
     clear: () => store.clear(),
-  };
+    key: () => null,
+    get length() {
+      return store.size;
+    },
+  } as Storage;
 }
 
 let sentEvents: { url: string; body: Record<string, unknown> }[];
@@ -24,16 +31,16 @@ beforeEach(() => {
   g.window = g; // insights no-ops without a window
   g.localStorage = stubStorage();
   g.document = { cookie: '' };
-  g.fetch = vi.fn((url: string, init: RequestInit) => {
-    sentEvents.push({ url: String(url), body: JSON.parse(String(init.body)) });
+  g.fetch = vi.fn((url: unknown, init: { body?: unknown }) => {
+    sentEvents.push({ url: String(url), body: JSON.parse(String(init.body)) as Record<string, unknown> });
     return Promise.resolve({ ok: true });
   });
 });
 
 afterEach(() => {
-  delete g.window;
-  delete g.localStorage;
-  delete g.document;
+  Reflect.deleteProperty(g, 'window');
+  Reflect.deleteProperty(g, 'localStorage');
+  Reflect.deleteProperty(g, 'document');
   vi.restoreAllMocks();
 });
 
@@ -74,7 +81,7 @@ describe('clickMap', () => {
         throw new Error('full');
       },
       removeItem: () => {},
-    };
+    } as unknown as Storage;
     expect(() => rememberClick('p1', 'q1')).not.toThrow();
     expect(queryIdFor('p1')).toBeUndefined();
     clearClickMap();
@@ -96,7 +103,10 @@ describe('Insights.attach', () => {
     await tick();
     expect(eventNames()).toContain('search-query');
     expect(eventNames()).toContain('search-session');
-    const search = eventByName('search-query') as { eventData: { search: Record<string, unknown> } };
+    const search = eventByName('search-query') as {
+      app: string;
+      eventData: { search: Record<string, unknown> };
+    };
     expect(search.eventData.search.queryId).toBe('q1');
     expect(search.eventData.search.totalHits).toBe(3);
     expect(search.app).toBe('acme');

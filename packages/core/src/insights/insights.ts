@@ -13,8 +13,15 @@ import { queryIdFor, rememberClick } from './clickMap';
  * search-session (session-based CTR denominator), product-clicked, and
  * purchase-complete with eventData.order.{orderId, amount} — the fields the
  * existing analytics SQL already reads. Attribution is queryID-chained: every
- * click carries the queryId of the results on screen, and purchases rejoin
- * per line item through the click map.
+ * click carries the queryId of the page that produced the clicked item (per
+ * item, so infinite-scroll clicks attribute to their own page's search), and
+ * purchases rejoin per line item through the click map.
+ *
+ * Counting rule (deliberate): every backend request with a fresh queryId is
+ * one tracked search — including loadMore/pagination pages, matching how
+ * Algolia counts tracked searches per request. The queryId dedupe only guards
+ * against replays of the SAME request (cache hits, back button), not against
+ * a query legitimately spanning several pages.
  */
 
 export interface PurchaseItem {
@@ -39,9 +46,11 @@ export class Insights {
   private client: InsightsClient;
   /** queryIds already reported — cache replays (back button, pagination back) must not double-count a search. */
   private sentQueries = new Set<string>();
+  /** In-memory fallback when localStorage is unavailable (see touchSession). */
+  private sessionTouched = false;
 
-  constructor(cfg: InsightsConfig) {
-    this.client = new InsightsClient(cfg);
+  constructor(readonly config: InsightsConfig) {
+    this.client = new InsightsClient(config);
   }
 
   /** Subscribe to a controller's bus. Returns a detach function. */
@@ -127,15 +136,21 @@ export class Insights {
    */
   private touchSession(): void {
     let last = 0;
+    let storageOk = true;
     try {
       last = Number(localStorage.getItem(SESSION_KEY)) || 0;
     } catch {
-      /* storage unavailable — degrade to one session event per page load via sentinel below */
+      storageOk = false;
     }
+    // Without storage (Safari private mode) `last` is 0 on every call — the
+    // in-memory flag degrades to one session event per page load instead of
+    // one per search, which would badly inflate the CTR denominator.
+    if (!storageOk && this.sessionTouched) return;
     const now = Date.now();
     if (now - last >= SESSION_WINDOW_MS) {
       this.client.send('search-session', { session: { startedAt: now } });
     }
+    this.sessionTouched = true;
     try {
       localStorage.setItem(SESSION_KEY, String(now));
     } catch {
@@ -149,10 +164,24 @@ export class Insights {
 
 let singleton: Insights | null = null;
 
-/** Idempotent for identical config; reconfigures on change. */
+/**
+ * Idempotent for identical config — a provider reconnect (DOM move, host
+ * re-render) must return the existing instance, or its sentQueries dedupe
+ * resets and a cache-replayed search gets double-counted. Reconfigures only
+ * on an actual config change.
+ */
 export function configureInsights(cfg: InsightsConfig): Insights {
-  singleton = new Insights(cfg);
-  return singleton;
+  const c = singleton?.config;
+  if (
+    !c ||
+    c.appId !== cfg.appId ||
+    c.apiKey !== cfg.apiKey ||
+    c.collection !== cfg.collection ||
+    c.trackingHost !== cfg.trackingHost
+  ) {
+    singleton = new Insights(cfg);
+  }
+  return singleton!;
 }
 
 export function getInsights(): Insights | null {
@@ -161,5 +190,11 @@ export function getInsights(): Insights | null {
 
 /** Convenience for host pages: window.sparq('purchase', …) lands here. */
 export function trackPurchase(data: PurchaseData): void {
-  singleton?.purchase(data);
+  if (!singleton) {
+    console.error(
+      '[sparq] purchase dropped — insights is not configured on this page. Call sparq("init", {appId, apiKey}) before sparq("purchase", …), or render a <sparq-search insights> element.',
+    );
+    return;
+  }
+  singleton.purchase(data);
 }

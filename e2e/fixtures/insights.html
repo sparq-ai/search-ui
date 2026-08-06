@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>e2e insights</title>
+  <script src="/e2e/fixtures/mock-data.js"></script>
+  <script>
+    // Pre-load command stub (documented pattern): these queue until the
+    // library loads, then drain in order — init first, then the purchase.
+    window.sparq = window.sparq || function () { (window.sparq.q = window.sparq.q || []).push(arguments); };
+    sparq('init', { appId: 'test-app', apiKey: 'pk_test_key', collection: 'products' });
+    sparq('purchase', { orderId: 'queued-1', items: [{ id: 'unclicked-item', price: 5, quantity: 1 }] });
+  </script>
+  <script src="/packages/components/dist/sparq.js" defer></script>
+</head>
+<body>
+  <sparq-search collection="products" api-host="mock:" items-per-page="5" insights app-id="test-app" api-key="pk_test_key">
+    <sparq-searchbox placeholder="Search…"></sparq-searchbox>
+    <!-- Link-free template: the click test must stay on the page to then fire a purchase. -->
+    <sparq-items>
+      <template>
+        <article><h3>{{name}}</h3><p>{{brand}} — ${{price}}</p></article>
+      </template>
+    </sparq-items>
+  </sparq-search>
+</body>
+</html>

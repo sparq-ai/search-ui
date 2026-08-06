@@ -97,6 +97,7 @@ export class SearchController {
   private debounceTimer: ReturnType<typeof setTimeout> | undefined;
   private stalledTimer: ReturnType<typeof setTimeout> | undefined;
   private inflight: Inflight | null = null;
+  private accumulatedQueryIds: string[] = [];
   private cache = new LruCache<SearchResponse>();
   private listeners = new Map<ControllerEventName, Set<(detail: unknown) => void>>();
   private subscribers = new Set<(state: Readonly<SearchState>) => void>();
@@ -326,11 +327,14 @@ export class SearchController {
 
   /**
    * Report a result click on the controller bus (widgets call this alongside
-   * their DOM event). Carries the queryId of the results currently on screen
-   * so insights can attribute the click to the exact search that produced it.
+   * their DOM event). `index` is the position in the rendered list (which is
+   * accumulatedItems in both paged and infinite modes), so the per-page
+   * queryId lookup attributes the click to the exact search that produced
+   * that item — not merely the most recent page's search.
    */
   trackItemClick(item: Item, index: number): void {
-    this.emit('item-click', { item, index, queryId: this.state.results?.queryId });
+    const queryId = this.accumulatedQueryIds[index] || this.state.results?.queryId;
+    this.emit('item-click', { item, index, queryId });
   }
 
   subscribe(fn: (state: Readonly<SearchState>) => void): () => void {
@@ -472,6 +476,12 @@ export class SearchController {
       };
       this.state.results = results;
       this.state.accumulatedItems = append ? [...this.state.accumulatedItems, ...items] : [...items];
+      // Parallel to accumulatedItems: which search produced each rendered item.
+      // In accumulated (infinite-scroll) mode the latest results.queryId belongs
+      // to the newest page only — a click on a page-1 item three loads later
+      // must still attribute to page 1's search.
+      const pageIds = items.map(() => res.queryId ?? '');
+      this.accumulatedQueryIds = append ? [...this.accumulatedQueryIds, ...pageIds] : pageIds;
       this.state.status = 'success';
       this.state.error = null;
       this.emit('search', { results, uiState: ui, raw: res.raw });

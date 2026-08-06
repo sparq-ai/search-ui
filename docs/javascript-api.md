@@ -152,3 +152,23 @@ window.__SPARQ_MOCK__ = { data: [/* items */], delayMs: 100, suggestions: ['…'
 ```
 
 `window.SparqSearchUI` also exposes `version`, `register()`, `createSparqClient(cfg)`, `createMockClient(data, opts)`, and the `SearchController` class for headless use.
+
+## Insights
+
+Enable with the `insights` attribute on [`<sparq-search>`](components/sparq-search.md#insights-search-analytics) — searches and result clicks are then reported automatically. The JS surface exists for pages without a search element (order confirmation) and for custom integrations:
+
+```js
+// window.sparq — command global (safe to call before the script loads with the
+// pre-load stub shown in the sparq-search docs; calls queue and drain in order)
+sparq('init', { appId: 'acme', apiKey: 'pk_search_xxx', collection: 'products', trackingHost: '…' });
+sparq('purchase', {
+  orderId: '10482',          // required
+  amount: 91.8,              // optional — derived from items when omitted
+  currency: 'EUR',           // optional
+  items: [{ id: '8821', price: 39.9, quantity: 2 }],
+});
+```
+
+Misconfiguration is loud, never fatal: `sparq('purchase', …)` without a prior `init` (or a `<sparq-search insights>` on the page) drops the event with a `console.error` naming the fix; delivery failures are silently swallowed — analytics never breaks checkout.
+
+For npm/headless users the same pieces are importable from `@sparq/search-core`: `configureInsights(cfg)`, `getInsights()`, `trackPurchase(data)`, and the `Insights` class (`insights.attach(controller)` returns a detach function). Attribution model and event taxonomy: ARCHITECTURE.md §20.

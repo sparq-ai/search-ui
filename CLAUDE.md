@@ -47,7 +47,7 @@ Search these before writing any new helper; duplicating one fails review:
 - The word "hits" is **banned** everywhere except `core/src/client/sparqClient.ts` (wire-field rename). CI greps.
 - **One API request per search** — load-bearing contract (server-side disjunctive facets). Never add client-side fan-out to `SearchController`.
 - CSS isolation both ways: never inject into `document.head`; never style the consumer's light-DOM markup; every shadow tree starts with `RESET_CSS` (`all: initial` firewall).
-- `sparqClient.ts` is the ONLY file that may know REST specifics.
+- `sparqClient.ts` is the ONLY file that may know search-API REST specifics; `insights/insightsClient.ts` is its one sanctioned counterpart for the st-tracking API (ARCHITECTURE §20) — no third wire client.
 - Everything exported from `packages/*/src/index.ts` + `cdn.ts` is public API — don't remove/rename casually.
 - `lib/` is a CI-managed build artifact — never hand-edit.
 - Never write the literal skip-ci token in commit messages (it skips CI).
