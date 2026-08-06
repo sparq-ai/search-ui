@@ -44,3 +44,14 @@ export { compileItemTemplate, renderBlank, type ItemRenderer } from './template/
 export { isSafeUrl } from './template/sanitize';
 
 export { attachUrlSync, parseUrlState, serializeUrlState } from './routing/urlSync';
+
+export {
+  Insights,
+  configureInsights,
+  getInsights,
+  trackPurchase,
+  type PurchaseData,
+  type PurchaseItem,
+} from './insights/insights';
+export { InsightsClient, type InsightsConfig } from './insights/insightsClient';
+export { clearClickMap, queryIdFor, rememberClick } from './insights/clickMap';

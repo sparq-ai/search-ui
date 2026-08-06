@@ -1,6 +1,7 @@
 import {
   SearchController,
   attachUrlSync,
+  configureInsights,
   type SearchHooks,
   type SparqClient,
 } from '@sparq/search-core';
@@ -67,6 +68,25 @@ export class SparqSearchElement extends HTMLElement {
       controller.on('refine', (d) => dispatchSparqEvent(this, 'sparq:refine', d)),
       controller.on('page-change', (d) => dispatchSparqEvent(this, 'sparq:page-change', d)),
     );
+
+    // Insights: automatic search/click/purchase analytics, off unless opted in.
+    // Configured as the module singleton so window.sparq('purchase', …) works
+    // on pages that still render a <sparq-search insights> element.
+    if (parseBoolAttr(this.getAttribute('insights'))) {
+      const appId = this.getAttribute('app-id');
+      const apiKey = this.getAttribute('api-key');
+      if (appId && apiKey) {
+        const insights = configureInsights({
+          appId,
+          apiKey,
+          collection,
+          trackingHost: this.getAttribute('tracking-host') ?? undefined,
+        });
+        this.unsubs.push(insights.attach(controller));
+      } else {
+        console.error('[sparq] insights needs app-id and api-key attributes on <sparq-search>.');
+      }
+    }
 
     // URL → state must apply BEFORE the first search (ARCHITECTURE §13).
     if (parseBoolAttr(this.getAttribute('routing'))) {

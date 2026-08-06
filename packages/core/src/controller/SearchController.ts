@@ -60,7 +60,8 @@ export type ControllerEventName =
   | 'stateChange'
   | 'query-change'
   | 'refine'
-  | 'page-change';
+  | 'page-change'
+  | 'item-click';
 
 export interface Refinement {
   attr: string;
@@ -323,6 +324,15 @@ export class SearchController {
     };
   }
 
+  /**
+   * Report a result click on the controller bus (widgets call this alongside
+   * their DOM event). Carries the queryId of the results currently on screen
+   * so insights can attribute the click to the exact search that produced it.
+   */
+  trackItemClick(item: Item, index: number): void {
+    this.emit('item-click', { item, index, queryId: this.state.results?.queryId });
+  }
+
   subscribe(fn: (state: Readonly<SearchState>) => void): () => void {
     this.subscribers.add(fn);
     fn(this.state);
@@ -457,6 +467,7 @@ export class SearchController {
         facets: this.mergeFacets(res.facets, ui),
         facetStats: res.facetStats ?? {},
         processingTimeMs: res.processingTimeMs,
+        queryId: res.queryId,
         forUiState: ui,
       };
       this.state.results = results;
