@@ -50,8 +50,10 @@ export {
   configureInsights,
   getInsights,
   trackPurchase,
+  type InsightsConfig,
   type PurchaseData,
   type PurchaseItem,
 } from './insights/insights';
-export { InsightsClient, type InsightsConfig } from './insights/insightsClient';
-export { clearClickMap, queryIdFor, rememberClick } from './insights/clickMap';
+// Engine internals re-exported from the canonical SDK (ARCHITECTURE §20) so
+// existing consumers of these names keep working.
+export { WireClient as InsightsClient, clearClickMap, queryIdFor, rememberClick } from '@sparq/analytics-js';

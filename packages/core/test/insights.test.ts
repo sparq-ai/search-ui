@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { SearchController, type SearchResponse } from '../src';
 import { Insights } from '../src/insights/insights';
-import { clearClickMap, queryIdFor, rememberClick } from '../src/insights/clickMap';
+import { clearClickMap, queryIdFor, rememberClick } from '../src';
 import { recordingClient, response, tick } from './helpers';
 
 // The insights module touches window/document/localStorage/fetch; tests run in
