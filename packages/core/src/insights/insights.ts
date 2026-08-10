@@ -2,10 +2,13 @@ import {
   SparqInsights,
   configureInsights as sdkConfigureInsights,
   getInsights as sdkGetInsights,
+  setTrackingConsent,
   trackPurchase as sdkTrackPurchase,
   type InsightsConfig,
   type PurchaseData,
 } from '@sparq/analytics-js';
+
+export { setTrackingConsent };
 import type { SearchController } from '../controller/SearchController';
 import type { Item } from '../state';
 

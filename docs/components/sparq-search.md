@@ -84,7 +84,23 @@ To attribute **orders** to searches, add one snippet to your order-confirmation 
 
 The first line is the standard pre-load stub: calls queue until the library loads, so snippet order never matters. `sparq('init', …)` is only needed on pages without a `<sparq-search insights>` element (confirmation pages usually have none). Each purchased item is matched to the search whose result was clicked within the last hour; unmatched items still count toward total revenue. Full API: [JavaScript API — insights](../javascript-api.md#insights).
 
-Privacy notes: events carry a random first-party visitor id (cookie `uId`), never personal data; leaving the `insights` attribute off (the default) sends nothing at all.
+### Privacy & consent
+
+Events carry a random first-party visitor id (cookie `uId`), never personal data, and leaving the `insights` attribute off (the default) sends nothing at all. For stores with a cookie banner, wire consent with the `consent` command — while revoked, **no events are sent and no cookie is written**:
+
+```html
+<script>
+  window.sparq = window.sparq || function () { (window.sparq.q = window.sparq.q || []).push(arguments); };
+  sparq('consent', false);                 // before the shopper answers the banner
+  myCookieBanner.onAccept(() => sparq('consent', true));
+</script>
+```
+
+Calls queue through the pre-load stub, so ordering relative to the library script never matters.
+
+### Verifying your events
+
+Open DevTools → Network → filter on your tracking host (`events.sparq.ai`). You should see a POST per event: `search-query` after a search settles, `search-session` on the first search in 30 minutes, `product-clicked` when a result is clicked, and `purchase-complete` on the confirmation page (fired by your `sparq('purchase', …)` snippet). A `201` response means the event was accepted. Common causes of missing events: the `insights` attribute is absent, `sparq('purchase', …)` runs without `init` on a page with no `<sparq-search insights>` (a console error names the fix), consent was revoked, or an ad blocker is dropping the request.
 
 ## Notes
 

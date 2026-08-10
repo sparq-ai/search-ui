@@ -49,6 +49,7 @@ export {
   Insights,
   configureInsights,
   getInsights,
+  setTrackingConsent,
   trackPurchase,
   type InsightsConfig,
   type PurchaseData,

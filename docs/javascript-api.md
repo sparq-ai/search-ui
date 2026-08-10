@@ -167,8 +167,10 @@ sparq('purchase', {
   currency: 'EUR',           // optional
   items: [{ id: '8821', price: 39.9, quantity: 2 }],
 });
+sparq('consent', false);     // revoke tracking consent: no events, no cookie
+sparq('consent', true);      // grant it (wire to your cookie banner)
 ```
 
 Misconfiguration is loud, never fatal: `sparq('purchase', …)` without a prior `init` (or a `<sparq-search insights>` on the page) drops the event with a `console.error` naming the fix; delivery failures are silently swallowed — analytics never breaks checkout.
 
-For npm/headless users the same pieces are importable from `@sparq/search-core`: `configureInsights(cfg)`, `getInsights()`, `trackPurchase(data)`, and the `Insights` class (`insights.attach(controller)` returns a detach function). Attribution model and event taxonomy: ARCHITECTURE.md §20.
+For npm/headless users the same pieces are importable from `@sparq/search-core`: `configureInsights(cfg)`, `getInsights()`, `trackPurchase(data)`, `setTrackingConsent(granted)`, and the `Insights` class (`insights.attach(controller)` returns a detach function). Attribution model and event taxonomy: ARCHITECTURE.md §20.

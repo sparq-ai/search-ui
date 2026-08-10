@@ -8,6 +8,7 @@ import {
   createMockClient,
   createSparqClient,
   SearchController,
+  setTrackingConsent,
   trackPurchase,
   type InsightsConfig,
   type PurchaseData,
@@ -42,9 +43,11 @@ const api = {
  */
 function sparq(command: 'purchase', data: PurchaseData): void;
 function sparq(command: 'init', data: InsightsConfig): void;
+function sparq(command: 'consent', granted: boolean): void;
 function sparq(command: string, data: unknown): void {
   if (command === 'purchase') trackPurchase(data as PurchaseData);
   else if (command === 'init') configureInsights(data as InsightsConfig);
+  else if (command === 'consent') setTrackingConsent(data !== false);
   else console.error(`[sparq] unknown command "${command}"`);
 }
 
