@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Insights — Sparq Search UI</title>
+  <script src="/mock-data.js"></script>
+  <script>
+    // Intercept the tracking endpoint so the demo shows every analytics event
+    // on-page instead of sending it anywhere. Installed before the library loads.
+    (function () {
+      var realFetch = window.fetch.bind(window);
+      window.fetch = function (url, init) {
+        if (String(url).indexOf('/events') !== -1 && init && init.body) {
+          var evt = JSON.parse(init.body);
+          var log = document.getElementById('event-log');
+          if (log) {
+            var row = document.createElement('pre');
+            row.textContent = evt.eventName + '  ' + JSON.stringify(evt.eventData);
+            log.prepend(row);
+          }
+          return Promise.resolve(new Response('', { status: 201 }));
+        }
+        return realFetch(url, init);
+      };
+    })();
+    // Pre-load command stub — calls made before the library loads queue up.
+    window.sparq = window.sparq || function () { (window.sparq.q = window.sparq.q || []).push(arguments); };
+  </script>
+  <script type="module" src="/sparq-entry.ts"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; }
+    .cols { display: grid; grid-template-columns: 1fr 340px; gap: 24px; align-items: start; }
+    #event-log { border: 1px solid #ccc; border-radius: 6px; padding: 8px 12px; max-height: 480px; overflow: auto; }
+    #event-log pre { margin: 4px 0; font-size: 11px; white-space: pre-wrap; word-break: break-all; border-bottom: 1px dashed #eee; padding-bottom: 4px; }
+    button.buy { margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <p><a href="/index.html">← playground</a></p>
+  <h1>Insights (search analytics)</h1>
+  <p>
+    The <code>insights</code> attribute makes the widget report searches and result clicks, each stamped
+    with the search's <code>queryId</code>. Type, click a result, then press "Simulate order confirmation"
+    — the purchase event rejoins the clicked item to its search. All events appear in the log instead of
+    being sent (the tracking endpoint is stubbed on this page).
+  </p>
+
+  <div class="cols">
+    <div>
+      <sparq-search collection="products" api-host="mock:" insights app-id="demo" api-key="pk_demo">
+        <sparq-searchbox placeholder="Search shoes…" autofocus></sparq-searchbox>
+        <sparq-stats></sparq-stats>
+        <sparq-items empty-text="No shoes match your search."></sparq-items>
+        <sparq-pagination items-per-page="20" padding="2"></sparq-pagination>
+      </sparq-search>
+
+      <button class="buy" onclick="
+        sparq('purchase', {
+          orderId: 'demo-' + Date.now(),
+          currency: 'USD',
+          items: [{ id: window.__lastClickedId || '1', price: 79.0, quantity: 1 }],
+        });
+      ">Simulate order confirmation</button>
+      <p><small>Click a result first — the purchase then carries that item's <code>queryId</code>. Without a click, the item ships unattributed (counts toward total revenue only).</small></p>
+    </div>
+    <div>
+      <h3>Event log (newest first)</h3>
+      <div id="event-log"></div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('sparq:item-click', function (e) {
+      window.__lastClickedId = String(e.detail.item.id);
+    });
+  </script>
+</body>
+</html>

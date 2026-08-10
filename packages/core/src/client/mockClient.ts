@@ -69,6 +69,7 @@ export function createMockClient(
   const datasetFor = (collection: string): Item[] =>
     Array.isArray(data) ? data : (data[collection] ?? []);
 
+  let queryCounter = 0;
   const client: SparqClient = {
     async search(req: SearchRequest, callOpts?: { signal?: AbortSignal }): Promise<SearchResponse> {
       const started = performance.now();
@@ -141,6 +142,9 @@ export function createMockClient(
         facets,
         facetStats,
         processingTimeMs: Math.max(1, Math.round(performance.now() - started)),
+        // Like the real API: a unique id per search execution, so insights
+        // demos/tests work against the mock.
+        queryId: `mock-q-${++queryCounter}`,
       };
     },
   };

@@ -139,6 +139,7 @@ export function useItemsWidget(mode: 'paged' | 'accumulated'): ItemsWidgetApi {
     const index = Number(wrapper.getAttribute('data-sparq-item'));
     const item = lastItems[index];
     if (item !== undefined) {
+      controller.value?.trackItemClick(item, index);
       dispatchSparqEvent(host, 'sparq:item-click', { item, index });
     }
   }

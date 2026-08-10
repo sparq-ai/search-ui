@@ -146,6 +146,7 @@ export function createSparqClient(cfg: SparqClientConfig): SparqClient {
         facets: normalizeFacets(wire.textFacets),
         facetStats: normalizeStats(wire.stats),
         processingTimeMs: Number(wire.responseTime ?? 0),
+        queryId: typeof wire.uniqueId === 'string' && wire.uniqueId ? wire.uniqueId : undefined,
         raw: wire,
       };
     },

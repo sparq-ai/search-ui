@@ -42,6 +42,12 @@ export interface SearchResponse {
   facetStats?: Record<string, { min: number; max: number }>;
   processingTimeMs: number;
   /**
+   * Server-assigned id of this exact search execution (wire field `uniqueId`).
+   * The attribution key linking click/conversion events back to the search that
+   * produced them — absent when the API predates it.
+   */
+  queryId?: string;
+  /**
    * Reserved for backend match metadata (positions / pre-highlighted fields).
    * Unused in v1 — no highlighting exists until the API provides this.
    */

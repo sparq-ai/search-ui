@@ -44,3 +44,17 @@ export { compileItemTemplate, renderBlank, type ItemRenderer } from './template/
 export { isSafeUrl } from './template/sanitize';
 
 export { attachUrlSync, parseUrlState, serializeUrlState } from './routing/urlSync';
+
+export {
+  Insights,
+  configureInsights,
+  getInsights,
+  setTrackingConsent,
+  trackPurchase,
+  type InsightsConfig,
+  type PurchaseData,
+  type PurchaseItem,
+} from './insights/insights';
+// Engine internals re-exported from the canonical SDK (ARCHITECTURE §20) so
+// existing consumers of these names keep working.
+export { WireClient as InsightsClient, clearClickMap, queryIdFor, rememberClick } from '@sparq/analytics-js';

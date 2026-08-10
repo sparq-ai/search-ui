@@ -84,7 +84,7 @@ Keep the core platform-neutral; ship these as a separate CDN bundle layered on t
 
 | Priority | Item | What it is (store-ui source) | Notes | Effort |
 |---|---|---|---|---|
-| ☐ | **Analytics adapters** | Sparq analytics (`@sparq/analytics-js`) + GA4/GTag/GTM trackers (`AnalyticsTracker`, `GoogleAnalyticsTracker`) | `sparq:*` events already carry the payloads; ship an official adapter that subscribes and forwards | M |
+| ◐ partial | **Analytics adapters** | Sparq analytics (`@sparq/analytics-js`) + GA4/GTag/GTM trackers (`AnalyticsTracker`, `GoogleAnalyticsTracker`) | Sparq side shipped 2026-08-06 as built-in insights (`insights` attr + `window.sparq('purchase', …)`, queryId attribution — ARCHITECTURE §20); GA4/GTM forwarding adapter still open | M |
 | ☐ | **i18n / translations config** | Locale-keyed labels for filter titles, sort options (`TranslationsHelper`) | Partially covered today via `transformValues` + attributes; a config surface would formalize it | S–M |
 | ☐ | **Per-collection behavior** | Widget visibility whitelist/blacklist per collection, collection-default sort tokens (`AppBoot`, `sortOrderFor_<handle>`) | Store-ui's deepest theme coupling — reconsider the design rather than port | M |
 | ☐ | **"Sync in progress" empty state** | Backend index-not-ready panel (`SqNoContent`) | Detect the condition in the adapter; message via `slot="empty"` | S |

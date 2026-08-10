@@ -34,6 +34,8 @@ export interface SearchResults {
   facets: Record<string, FacetValue[]>;
   facetStats: Record<string, { min: number; max: number }>;
   processingTimeMs: number;
+  /** Attribution id of the search execution that produced these results (see SearchResponse.queryId). */
+  queryId?: string;
   /** Snapshot of the UiState these results correspond to. */
   forUiState: UiState;
 }
