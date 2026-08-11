@@ -64,8 +64,8 @@ importers:
   packages/core:
     dependencies:
       '@sparq/analytics-js':
-        specifier: ^2.0.0
-        version: 2.0.0
+        specifier: ^2.0.1
+        version: 2.0.1
       '@vue/reactivity':
         specifier: ^3.5.13
         version: 3.5.39
@@ -429,8 +429,8 @@ packages:
     peerDependencies:
       size-limit: 11.2.0
 
-  '@sparq/analytics-js@2.0.0':
-    resolution: {integrity: sha512-vGP6JE1ZgMiqo1hC5KoBQVe50XOkhOgjJqT0wh0TB+PTgn5IXwERs+dYPnj8sIRkTkuCzoqKlLEHRtX/4l39AA==}
+  '@sparq/analytics-js@2.0.1':
+    resolution: {integrity: sha512-9gPsg3FGr3bFIyT7wn9HREWpErQPlaKrjjFpkZwbDGVbuUw0m4RHNrjQcePD3CNs9Esdyc47elSiNCJCgxn+5Q==}
 
   '@types/chai@5.2.3':
     resolution: {integrity: sha512-Mw558oeA9fFbv65/y4mHtXDs9bPnFMZAL/jxdPFUpOHHIXX91mcgEHbS5Lahr+pwZFR8A7GQleRWeI6cGFC2UA==}
@@ -1149,7 +1149,7 @@ snapshots:
     dependencies:
       size-limit: 11.2.0
 
-  '@sparq/analytics-js@2.0.0': {}
+  '@sparq/analytics-js@2.0.1': {}
 
   '@types/chai@5.2.3':
     dependencies:
