@@ -57,4 +57,4 @@ export {
 } from './insights/insights';
 // Engine internals re-exported from the canonical SDK (ARCHITECTURE §20) so
 // existing consumers of these names keep working.
-export { WireClient as InsightsClient, clearClickMap, queryIdFor, rememberClick } from '@sparq/analytics-js';
+export { WireClient as InsightsClient, clearClickMap, clearSentOrders, queryIdFor, rememberClick } from '@sparq/analytics-js';

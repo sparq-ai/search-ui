@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { SearchController, type SearchResponse } from '../src';
 import { Insights } from '../src/insights/insights';
-import { clearClickMap, queryIdFor, rememberClick } from '../src';
+import { clearClickMap, clearSentOrders, queryIdFor, rememberClick } from '../src';
 import { recordingClient, response, tick } from './helpers';
 
 // The insights module touches window/document/localStorage/fetch; tests run in
@@ -35,6 +35,9 @@ beforeEach(() => {
     sentEvents.push({ url: String(url), body: JSON.parse(String(init.body)) as Record<string, unknown> });
     return Promise.resolve({ ok: true });
   });
+  // The SDK's purchase dedupe is module-level (by design — a fresh page is a
+  // fresh module); tests share the module, so reset it between tests.
+  clearSentOrders();
 });
 
 afterEach(() => {

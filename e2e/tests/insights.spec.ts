@@ -105,4 +105,18 @@ test.describe('insights', () => {
     await page.waitForTimeout(300);
     expect(events).toHaveLength(0);
   });
+
+  test('a reloaded confirmation page does not re-send the same order (SDK 2.0.1 dedupe)', async ({ page }) => {
+    const events = await interceptEvents(page);
+    await page.goto('/e2e/fixtures/insights.html');
+    await expect(page.locator('[data-sparq-item]')).toHaveCount(5);
+    await page.evaluate(() => window.sparq?.('purchase', { orderId: 'reload-1', items: [{ id: 'r1', price: 9, quantity: 1 }] }));
+    await expect.poll(() => byName(events, 'purchase-complete').filter((e) => (e.eventData.order as { orderId?: string }).orderId === 'reload-1').length).toBe(1);
+
+    await page.reload();
+    await expect(page.locator('[data-sparq-item]')).toHaveCount(5);
+    await page.evaluate(() => window.sparq?.('purchase', { orderId: 'reload-1', items: [{ id: 'r1', price: 9, quantity: 1 }] }));
+    await page.waitForTimeout(400);
+    expect(byName(events, 'purchase-complete').filter((e) => (e.eventData.order as { orderId?: string }).orderId === 'reload-1')).toHaveLength(1);
+  });
 });
