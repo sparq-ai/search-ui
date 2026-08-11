@@ -11,7 +11,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@sparq/analytics-js": "^2.0.0",
+    "@sparq/analytics-js": "^2.0.1",
     "@vue/reactivity": "^3.5.13"
   },
   "devDependencies": {
