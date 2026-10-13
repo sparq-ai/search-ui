@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { parseBoolAttr } from '../attrs';
 import { useInfiniteSentinel } from '../composables/useInfiniteSentinel';
 import { useItemsWidget } from '../composables/useItemsWidget';
@@ -20,8 +20,15 @@ function loadMore(): void {
 }
 
 if (auto) {
-  useInfiniteSentinel(sentinel, () => {
+  const inView = useInfiniteSentinel(sentinel, () => {
     if (canLoadMore.value) loadMore();
+  });
+  // The observer fires on intersection changes only. Reaching the sentinel
+  // mid-request is dropped by the guard above, and the sentinel stays in view
+  // afterwards, so no further event arrives — scrolling fast would stop loading
+  // until the shopper scrolled up and back down. Retry when the guard clears.
+  watch(canLoadMore, (ready) => {
+    if (ready && inView.value) loadMore();
   });
 }
 </script>
